@@ -4,11 +4,13 @@ import (
 	dsModels "github.com/edgexfoundry/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
 	contract "github.com/edgexfoundry/go-mod-core-contracts/models"
+	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice"
 )
 
 type Driver struct {
 	lc      logger.LoggingClient
 	asyncCh chan<- *dsModels.AsyncValues
+	Devices map[string]jdevice.JDevice
 }
 
 func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *dsModels.AsyncValues) error {
