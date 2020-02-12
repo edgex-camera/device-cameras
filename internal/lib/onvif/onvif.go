@@ -4,10 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"sync"
 	"time"
 
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
 	"github.com/yakovlevdmv/goonvif"
 	"github.com/yakovlevdmv/goonvif/Device"
 	"github.com/yakovlevdmv/goonvif/PTZ"
@@ -15,36 +13,17 @@ import (
 	"github.com/yakovlevdmv/goonvif/xsd/onvif"
 )
 
-type onvifDevice interface {
+type OnvifDevice interface {
 	CallMethod(method interface{}) (*http.Response, error)
 }
 
-type onvifCamera struct {
-	device       onvifDevice
-	lc           logger.LoggingClient
-	OnvifConfig  OnvifConfig
-	stopTimer    *time.Timer
-	mutex        *sync.Mutex
-	profileToken onvif.ReferenceToken
-}
-
-func NewOnvif(lc logger.LoggingClient, config OnvifConfig) (cam Onvif, err error) {
-	return &onvifCamera{
-		lc:           lc,
-		device:       nil,
-		OnvifConfig:  config,
-		mutex:        &sync.Mutex{},
-		profileToken: "",
-	}, nil
-}
-
-func (c *onvifCamera) connect() (err error) {
+func (c *OnvifCamera) connect() (err error) {
 	if c.profileToken == "" {
 		c.profileToken = getToken(c.OnvifConfig)
 	}
 	defer func() {
 		if r := recover(); r != nil {
-			c.lc.Error(fmt.Sprint("Init Onvif camera failed, Recovered in ", r))
+			c.Lc.Error(fmt.Sprint("Init Onvif camera failed, Recovered in ", r))
 			err = fmt.Errorf("Init Onvif camera failed")
 		}
 	}()
@@ -54,7 +33,7 @@ func (c *onvifCamera) connect() (err error) {
 	}
 	device, err := goonvif.NewDevice(c.OnvifConfig.Address)
 	if err != nil {
-		c.lc.Error("onvif camera connect error: %v", err)
+		c.Lc.Error("onvif camera connect error: %v", err)
 		return err
 	}
 	device.Authenticate(c.OnvifConfig.Username, c.OnvifConfig.Password)
@@ -62,7 +41,7 @@ func (c *onvifCamera) connect() (err error) {
 	return nil
 }
 
-func (c *onvifCamera) callMethod(method interface{}) error {
+func (c *OnvifCamera) callMethod(method interface{}) error {
 	err := c.connect()
 	if err != nil {
 		return err
@@ -74,12 +53,12 @@ func (c *onvifCamera) callMethod(method interface{}) error {
 
 	// buf := new(bytes.Buffer)
 	// buf.ReadFrom(response.Body)
-	// c.lc.Info(fmt.Sprintf("onvif callMethod response: %s", buf.String()))
+	// c.Lc.Info(fmt.Sprintf("onvif callMethod response: %s", buf.String()))
 	return nil
 }
 
-func (c *onvifCamera) ContinuousMove(timeout time.Duration, moveSpeed Move) error {
-	c.lc.Info("camera move started")
+func (c *OnvifCamera) ContinuousMove(timeout time.Duration, moveSpeed Move) error {
+	c.Lc.Info("camera move started")
 	req := PTZ.ContinuousMove{
 		ProfileToken: c.profileToken,
 		Velocity: onvif.PTZSpeed{
@@ -107,10 +86,10 @@ func (c *onvifCamera) ContinuousMove(timeout time.Duration, moveSpeed Move) erro
 	return err
 }
 
-func (c *onvifCamera) Stop() error {
+func (c *OnvifCamera) Stop() error {
 	c.ensureNoStopTimer()
 
-	c.lc.Info("camera move stopped")
+	c.Lc.Info("camera move stopped")
 	req := PTZ.Stop{
 		ProfileToken: c.profileToken,
 		PanTilt:      true,
@@ -120,8 +99,8 @@ func (c *onvifCamera) Stop() error {
 	return c.callMethod(req)
 }
 
-func (c *onvifCamera) SetHomePosition() error {
-	c.lc.Info("camera move reset")
+func (c *OnvifCamera) SetHomePosition() error {
+	c.Lc.Info("camera move reset")
 	req := PTZ.SetPreset{
 		ProfileToken: c.profileToken,
 		PresetToken:  "1",
@@ -129,8 +108,8 @@ func (c *onvifCamera) SetHomePosition() error {
 	return c.callMethod(req)
 }
 
-func (c *onvifCamera) Reset() error {
-	c.lc.Info("camera move reset")
+func (c *OnvifCamera) Reset() error {
+	c.Lc.Info("camera move reset")
 
 	c.ensureNoStopTimer()
 	c.Stop()
@@ -142,13 +121,13 @@ func (c *onvifCamera) Reset() error {
 	return c.callMethod(req)
 }
 
-func (c *onvifCamera) GetPresets() string {
-	c.lc.Info("get presets info")
+func (c *OnvifCamera) GetPresets() string {
+	c.Lc.Info("get presets info")
 	return getPresets()
 }
 
-func (c *onvifCamera) SetPreset(number int64) error {
-	c.lc.Info("set preset", number)
+func (c *OnvifCamera) SetPreset(number int64) error {
+	c.Lc.Info("set preset", number)
 	if number == int64(1) {
 		return errors.New("cannot set preset 1, it is home position")
 	}
@@ -160,8 +139,8 @@ func (c *onvifCamera) SetPreset(number int64) error {
 	return c.callMethod(req)
 }
 
-func (c *onvifCamera) GotoPreset(number int64) error {
-	c.lc.Info("camera move to preset", number)
+func (c *OnvifCamera) GotoPreset(number int64) error {
+	c.Lc.Info("camera move to preset", number)
 	c.ensureNoStopTimer()
 	req := PTZ.GotoPreset{
 		ProfileToken: c.profileToken,
@@ -170,8 +149,8 @@ func (c *onvifCamera) GotoPreset(number int64) error {
 	return c.callMethod(req)
 }
 
-func (c *onvifCamera) SyncTime() error {
-	c.lc.Info("time sync")
+func (c *OnvifCamera) SyncTime() error {
+	c.Lc.Info("time sync")
 	now := time.Now().UTC()
 	req := Device.SetSystemDateAndTime{
 		TimeZone: onvif.TimeZone{
@@ -194,7 +173,7 @@ func (c *onvifCamera) SyncTime() error {
 }
 
 // helpers
-func (c *onvifCamera) ensureNoStopTimer() {
+func (c *OnvifCamera) ensureNoStopTimer() {
 	c.mutex.Lock()
 	if c.stopTimer != nil {
 		c.stopTimer.Stop()

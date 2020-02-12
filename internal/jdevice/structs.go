@@ -1,11 +1,14 @@
 package jdevice
 
-import (
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice/camera"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice/onvif"
-)
-
 type JDevice struct {
-	Camera camera.Camera
-	Onvif  onvif.Onvif
+	Name   string
+	Id     string
+	Camera Camera
+	Onvif  Onvif
+}
+
+type JDeviceConfig struct {
+	Name  string `json:"name"`
+	Id    string `json:"id"`
+	Onvif bool   `json:"onvif"`
 }

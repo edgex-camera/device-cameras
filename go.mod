@@ -13,6 +13,7 @@ require (
 	github.com/edgexfoundry/device-sdk-go v1.0.0
 	github.com/edgexfoundry/go-mod-core-contracts v0.1.29
 	github.com/elgs/gostrgen v0.0.0-20161222160715-9d61ae07eeae // indirect
+	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gorilla/mux v1.6.2
 	github.com/satori/go.uuid v1.2.0 // indirect

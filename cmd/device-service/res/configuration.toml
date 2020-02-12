@@ -1,0 +1,65 @@
+[Writable]
+LogLevel = 'INFO'
+
+[Service]
+Host = "edgex-device-cameras"
+Port = 80
+ConnectRetries = 20
+Labels = []
+OpenMsg = "device service started"
+Timeout = 5000
+EnableAsyncReadings = true
+AsyncBufferSize = 16
+
+[Registry]
+Host = "edgex-core-consul"
+Port = 8500
+Type = "consul"
+CheckInterval = "10s"
+FailLimit = 3
+FailWaitTime = 10
+
+[Clients]
+  [Clients.Data]
+  Name = "edgex-core-data"
+  Protocol = "http"
+  Host = "edgex-core-data"
+  Port = 48080
+  Timeout = 5000
+
+  [Clients.Metadata]
+  Name = "edgex-core-metadata"
+  Protocol = "http"
+  Host = "edgex-core-metadata"
+  Port = 48081
+  Timeout = 5000
+
+  [Clients.Logging]
+  Name = "edgex-support-logging"
+  Protocol = "http"
+  Host = "edgex-support-logging"
+  Port = 48061
+
+[Device]
+  DataTransform = true
+  InitCmd = ""
+  InitCmdArgs = ""
+  MaxCmdOps = 128
+  MaxCmdValueLen = 256
+  RemoveCmd = ""
+  RemoveCmdArgs = ""
+  ProfilesDir = "./res"
+
+[Logging]
+EnableRemote = true
+File = "./device-service.log"
+
+# Pre-define Devices
+[[DeviceList]]
+  Name = "camera-factory"
+  Profile = "camera-factory"
+  Description = "专用于添加摄像头的Helpler Device"
+  Labels = []
+  [DeviceList.Protocols]
+    [DeviceList.Protocols.other]
+      Address = "/api/v1/device/camera-factory"
