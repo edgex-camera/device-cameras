@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice/utils"
+	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/utils"
 	jsonpatch "gopkg.in/evanphx/json-patch.v4"
 )
 
@@ -41,34 +41,7 @@ type Auth struct {
 	Password string `json:"password"`
 }
 
-type CameraConfig struct {
-	Enabled       bool   `json:"enabled"`
-	InputAddr     string `json:"input_addr"`
-	Auth          `json:"auth"`
-	StreamConfig  `json:"stream"`
-	CaptureConfig `json:"capture"`
-	VideoConfig   `json:"video"`
-	QualityConfig `json:"quality"`
-}
-
-var defaultConf = CameraConfig{
-	Enabled:       true,
-	StreamConfig:  StreamConfig{Enabled: true},
-	CaptureConfig: CaptureConfig{Enabled: true},
-	VideoConfig: VideoConfig{
-		Enabled:    true,
-		Length:     600,
-		KeepRecord: 3,
-	},
-}
-
-var DefaultConf []byte
-
-func init() {
-	DefaultConf, _ = json.Marshal(defaultConf)
-}
-
-func (c *camera) MergeConfig(configPatch []byte) error {
+func (c *RawCamera) MergeConfig(configPatch []byte) error {
 	if c.IsEnabled() {
 		c.Disable(true)
 	}
@@ -102,7 +75,7 @@ func (c *camera) MergeConfig(configPatch []byte) error {
 	return nil
 }
 
-func (c *camera) GetConfigure() []byte {
+func (c *RawCamera) GetConfigure() []byte {
 	config, _ := json.Marshal(c.CameraConfig)
 	return config
 }

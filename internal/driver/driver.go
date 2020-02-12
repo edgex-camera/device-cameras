@@ -7,13 +7,20 @@ import (
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice"
 )
 
+const CAMERA_FACTORY = "camera-factory"
+
 type Driver struct {
-	lc      logger.LoggingClient
-	asyncCh chan<- *dsModels.AsyncValues
-	Devices map[string]jdevice.JDevice
+	lc            logger.LoggingClient
+	asyncCh       chan<- *dsModels.AsyncValues
+	JDevices      map[string]jdevice.JDevice
+	ProcessMethod string
 }
 
 func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *dsModels.AsyncValues) error {
+	d.lc = lc
+	d.asyncCh = asyncCh
+	d.JDevices = make(map[string]jdevice.JDevice)
+
 	return nil
 }
 
@@ -22,6 +29,26 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]cont
 }
 
 func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]contract.ProtocolProperties, reqs []dsModels.CommandRequest, params []*dsModels.CommandValue) error {
+	if deviceName == CAMERA_FACTORY {
+		var name, deviceType string
+		for _, param := range params {
+			switch param.DeviceResourceName {
+			case "name":
+				v, err := param.StringValue()
+				if err != nil {
+					return err
+				}
+				name = v
+			case "device_type":
+				v, err := param.StringValue()
+				if err != nil {
+					return err
+				}
+				deviceType = v
+			}
+			return d.AddJdevice(name, deviceType)
+		}
+	}
 	return nil
 }
 

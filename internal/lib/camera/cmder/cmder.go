@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice/camera/camera"
+	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/camera"
 )
 
 type cmder struct {

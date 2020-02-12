@@ -6,62 +6,53 @@ import (
 	"time"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice/utils/process"
+	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/utils/process"
 )
 
-type camera struct {
-	lc              logger.LoggingClient
-	cmder           CameraCmder
+type RawCamera struct {
+	ChannelId       string
+	Lc              logger.LoggingClient
+	Cmder           CameraCmder
 	CameraConfig    CameraConfig
 	processes       []process.Process
 	videoMaintainer *videoMaintainer
 	enabled         bool
 }
 
-func NewCamera(lc logger.LoggingClient, cmder CameraCmder, cc CameraConfig) Camera {
-	return &camera{
-		lc:           lc,
-		cmder:        cmder,
-		CameraConfig: cc,
-		processes:    nil,
-		enabled:      false,
-	}
-}
-
-func (c *camera) Enable() {
+func (c *RawCamera) Enable() {
 	if c.enabled {
-		c.lc.Error("camera already enabled")
+		c.Lc.Error("camera already enabled")
 		return
 	}
-	c.lc.Error("camera enabled")
+	c.Lc.Error("camera enabled")
 
 	c.enabled = true
 
-	producers := c.cmder.GetCmdProducers(c.CameraConfig)
+	producers := c.Cmder.GetCmdProducers(c.CameraConfig)
 	if c.processes == nil {
 		c.processes = []process.Process{}
 		for _, producer := range producers {
-			process := process.NewProcess(c.lc, producer, process.RestartPolicyAlways, "", "")
+			process := process.NewProcess(c.Lc, producer, process.RestartPolicyAlways, "", "")
 			c.processes = append(c.processes, process)
 			process.Start()
 		}
 	}
 
 	if c.CameraConfig.VideoConfig.Enabled {
-		videoMaintainer, err := newVideoMaintainer(c.lc, c.CameraConfig.VideoConfig.Path, c.CameraConfig.VideoConfig.KeepRecord)
+		videoMaintainer, err := newVideoMaintainer(c.Lc, c.CameraConfig.VideoConfig.Path, c.CameraConfig.VideoConfig.KeepRecord)
 		if err != nil {
-			c.lc.Error(fmt.Sprintf("video maintainer init failed: %v", err.Error()))
+			c.Lc.Error(fmt.Sprintf("video maintainer init failed: %v", err.Error()))
 		}
 		c.videoMaintainer = videoMaintainer
 	}
 }
 
-func (c *camera) Disable(wait bool) {
+func (c *RawCamera) Disable(wait bool) {
 	if !c.enabled {
-		c.lc.Error("camera already disabled")
+		c.Lc.Error("camera already disabled")
 		return
 	}
-	c.lc.Error("camera disabled")
+	c.Lc.Error("camera disabled")
 	c.enabled = false
 
 	if c.processes != nil {
@@ -69,7 +60,7 @@ func (c *camera) Disable(wait bool) {
 		for _, process := range c.processes {
 			err := process.Stop(10*time.Second, wait)
 			if err != nil {
-				c.lc.Error(err.Error())
+				c.Lc.Error(err.Error())
 			}
 		}
 		c.processes = nil
@@ -81,11 +72,11 @@ func (c *camera) Disable(wait bool) {
 	}
 }
 
-func (c *camera) IsEnabled() bool {
+func (c *RawCamera) IsEnabled() bool {
 	return c.enabled
 }
 
-func (c *camera) CapturePhotoJPG() (file *os.File, err error) {
+func (c *RawCamera) CapturePhotoJPG() (file *os.File, err error) {
 	if !c.CameraConfig.CaptureConfig.Enabled {
 		return nil, fmt.Errorf("video capture not enabled")
 	}
@@ -96,19 +87,19 @@ func (c *camera) CapturePhotoJPG() (file *os.File, err error) {
 			break
 		}
 		time.Sleep(100 * time.Millisecond)
-		c.lc.Error(fmt.Sprintf("open file failed (%s), retry after 100 milliseconds", err.Error()))
+		c.Lc.Error(fmt.Sprintf("open file failed (%s), retry after 100 milliseconds", err.Error()))
 	}
 	return file, err
 }
 
-func (c *camera) GetCapturePath() string {
+func (c *RawCamera) GetCapturePath() string {
 	return c.CameraConfig.CaptureConfig.Path
 }
 
-func (c *camera) GetVideoPaths() []string {
+func (c *RawCamera) GetVideoPaths() []string {
 	return c.videoMaintainer.getFileList()
 }
 
-func (c *camera) GetStreamAddr() string {
+func (c *RawCamera) GetStreamAddr() string {
 	return c.CameraConfig.StreamConfig.Address
 }
