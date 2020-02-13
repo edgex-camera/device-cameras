@@ -6,7 +6,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func appendConfigRoute(r *mux.Route) {
+func appendConfigRoute(r *mux.Router, h *handler) {
+	prefix := "/config"
+	subRouter := r.PathPrefix(prefix).Subrouter()
+
+	subRouter.Path("/{camera_name}").HandlerFunc(h.getCameraConfig).Methods(http.MethodGet)
+	subRouter.Path("/{camera_name}").HandlerFunc(h.postModifyCameraConfig).Methods(http.MethodPost)
 
 }
 

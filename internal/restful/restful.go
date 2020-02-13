@@ -21,7 +21,10 @@ func InitRestRoutes(lc logger.LoggingClient) http.Handler {
 		lc:     lc,
 	}
 	r := h.Router.PathPrefix(APIv1Prefix).Subrouter()
-	r.HandleFunc("/template_output", h.getTemplateOutput).Methods(http.MethodGet)
+	appendDeviceManageRoute(r, h)
+	appendCameraResourcesRoute(r, h)
+	appendOnvifRoute(r, h)
+	appendConfigRoute(r, h)
 	return h
 }
 
