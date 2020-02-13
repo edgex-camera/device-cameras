@@ -1,0 +1,24 @@
+package restful
+
+import (
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
+
+func appendCameraResourcesRoute(r *mux.Route) {}
+
+//获取截图路径
+func (h *handler) getCapturePath(w http.ResponseWriter, r *http.Request) {}
+
+//获取视频流地址
+func (h *handler) getStreamAddr(w http.ResponseWriter, r *http.Request) {}
+
+//获取视频存储路径
+func (h *handler) getVideoPaths(w http.ResponseWriter, r *http.Request) {}
+
+//获取图片链接列表
+func (h *handler) getImageURls(w http.ResponseWriter, r *http.Request) {}
+
+//获取video链接列表
+func (h *handler) getVideoURLs(w http.ResponseWriter, r *http.Request) {}
