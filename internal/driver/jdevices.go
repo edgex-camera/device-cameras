@@ -10,6 +10,7 @@ import (
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/camera"
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/camera/cmder"
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/onvif"
+	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/utils"
 )
 
 // 设备类型
@@ -42,7 +43,12 @@ func (d *Driver) AddJdevice(deviceName, deviceType string) error {
 			deviceCmder = cmder.NewCmder(PROCESS_FFMPEG)
 		}
 		cc := camera.CameraConfig{}
-		deviceCamera := normalcam.NewCamera(deviceName, d.lc, deviceCmder, cc)
+		// 默认生成一个channel的摄像头
+		channelId := utils.GenUUID()
+		deviceCamera, err := normalcam.NewCamera(deviceName, channelId, d.lc, deviceCmder, cc)
+		if err != nil {
+			return err
+		}
 		jDevice.Camera = deviceCamera
 	}
 	// onvif摄像头onvif部分
@@ -63,6 +69,17 @@ func (d *Driver) AddJdevice(deviceName, deviceType string) error {
 
 	d.JDevices[deviceName] = jDevice
 	return setupJdeviceConfig(jDevice)
+}
+
+// Remove Jdevice
+func (d *Driver) RemoveJdevice(deviceName string) error {
+	if _, ok := d.JDevices[deviceName]; !ok {
+		d.lc.Info(fmt.Sprintf("Device to remove is not running "), deviceName)
+	} else {
+		d.JDevices[deviceName].Camera.Disable(true)
+		// TODO
+	}
+	return nil
 }
 
 // JDevice基础信息

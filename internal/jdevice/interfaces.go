@@ -23,9 +23,9 @@ type Camera interface {
 	GetConfigure() []byte
 
 	// For channel manage
-	AddChannel(channelId string) error
+	AddChannel() error
 	RemoveChannel(channelId string) error
-	ListChannels() []byte
+	ListChannels() []string
 }
 
 type Onvif interface {

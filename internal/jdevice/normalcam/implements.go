@@ -1,6 +1,11 @@
 package normalcam
 
-import "os"
+import (
+	"errors"
+	"os"
+
+	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/utils"
+)
 
 // camera functions
 func (nc *NormalCamera) Enable() {
@@ -40,16 +45,32 @@ func (nc *NormalCamera) GetConfigure() []byte {
 	return nc.Camera.GetConfigure()
 }
 
-// TODO: channel management
-func (nc *NormalCamera) AddChannel(channelId string) error {
+func (nc *NormalCamera) AddChannel() error {
+	if nc.ChannelId != "" {
+		return errors.New("A channel already exists.")
+	}
+	channelId := utils.GenUUID()
+	rawcam, err := NewRawCamera(nc.Name, channelId, nc.lc, nc.cmder, nc.cc)
+	if err != nil {
+		return nil
+	}
+	nc.Camera = rawcam
+	nc.ChannelId = channelId
 	return nil
 }
 
 func (nc *NormalCamera) RemoveChannel(channelId string) error {
-	return nil
+	if channelId != nc.ChannelId {
+		return errors.New("No such channel id")
+	}
+	nc.Camera.Disable(true)
+	nc.ChannelId = ""
+	nc.Camera.CameraConfig.Enabled = false
+	return SetupRawCameraConfig(nc.Camera, nc.Name, channelId)
 }
 
-func (nc *NormalCamera) ListChannels() []byte {
-	res := make([]byte, 10)
+func (nc *NormalCamera) ListChannels() []string {
+	var res []string
+	res = append(res, nc.ChannelId)
 	return res
 }
