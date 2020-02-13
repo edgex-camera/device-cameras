@@ -28,6 +28,10 @@ func (nc *NormalCamera) GetCapturePath() string {
 	return nc.Camera.GetCapturePath()
 }
 
+func (nc *NormalCamera) GetImagePaths() []string {
+	return nc.Camera.GetImagePaths()
+}
+
 func (nc *NormalCamera) GetVideoPaths() []string {
 	return nc.Camera.GetVideoPaths()
 }
