@@ -30,23 +30,32 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]cont
 
 func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]contract.ProtocolProperties, reqs []dsModels.CommandRequest, params []*dsModels.CommandValue) error {
 	if deviceName == CAMERA_FACTORY {
-		var name, deviceType string
 		for _, param := range params {
 			switch param.DeviceResourceName {
-			case "name":
+			case "add_device", "device_type":
+				var name, deviceType string
+				switch param.DeviceResourceName {
+				case "add_device":
+					v, err := param.StringValue()
+					if err != nil {
+						return err
+					}
+					name = v
+				case "device_type":
+					v, err := param.StringValue()
+					if err != nil {
+						return err
+					}
+					deviceType = v
+					return d.AddJdevice(name, deviceType)
+				}
+			case "remove_device":
 				v, err := param.StringValue()
 				if err != nil {
 					return err
 				}
-				name = v
-			case "device_type":
-				v, err := param.StringValue()
-				if err != nil {
-					return err
-				}
-				deviceType = v
+				return d.RemoveJdevice(v)
 			}
-			return d.AddJdevice(name, deviceType)
 		}
 	}
 	return nil
