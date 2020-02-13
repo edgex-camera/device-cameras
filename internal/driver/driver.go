@@ -16,6 +16,8 @@ type Driver struct {
 	ProcessMethod string
 }
 
+var CurrentDriver Driver
+
 func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *dsModels.AsyncValues) error {
 	d.lc = lc
 	d.asyncCh = asyncCh
