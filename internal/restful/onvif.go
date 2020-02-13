@@ -6,7 +6,20 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func appendOnvifRoute(r *mux.Route) {}
+func appendOnvifRoute(r *mux.Router, h *handler) {
+	prefix := "/onvif"
+	subRouter := r.PathPrefix(prefix).Subrouter()
+
+	subRouter.Path("/presets").HandlerFunc(h.getPresetPosition).Methods(http.MethodGet)
+	subRouter.Path("/continuous_move").HandlerFunc(h.postOnvifMove).Methods(http.MethodPost)
+
+	subRouter.Path("/stop").HandlerFunc(h.postOnvifStop).Methods(http.MethodPost)
+	subRouter.Path("/set_home_position").HandlerFunc(h.postSetHomePosition).Methods(http.MethodPost)
+	subRouter.Path("/reset_position").HandlerFunc(h.postResetPosition).Methods(http.MethodPost)
+	subRouter.Path("/set_preset/{preset-number}").HandlerFunc(h.postSetPresetPosition).Methods(http.MethodPost)
+	subRouter.Path("/goto_preset/{preset-number}").HandlerFunc(h.postGotoPresetPosition).Methods(http.MethodPost)
+
+}
 
 // 获取预置位信息
 func (h *handler) getPresetPosition(w http.ResponseWriter, r *http.Request) {}

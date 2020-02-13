@@ -6,7 +6,17 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func appendCameraResourcesRoute(r *mux.Route) {}
+func appendCameraResourcesRoute(r *mux.Router, h *handler) {
+	prefix := "/source"
+	subRouter := r.PathPrefix(prefix).Subrouter()
+
+	subRouter.Path("/capture_path").HandlerFunc(h.getCapturePath).Methods(http.MethodGet)
+	subRouter.Path("/stream_addr").HandlerFunc(h.getStreamAddr).Methods(http.MethodGet)
+
+	subRouter.Path("/video_paths").HandlerFunc(h.getVideoPaths).Methods(http.MethodGet)
+	subRouter.Path("/images").HandlerFunc(h.getImageURls).Methods(http.MethodGet)
+	subRouter.Path("/vidoes").HandlerFunc(h.getImageURls).Methods(http.MethodGet)
+}
 
 //获取截图路径
 func (h *handler) getCapturePath(w http.ResponseWriter, r *http.Request) {}
