@@ -21,8 +21,8 @@ const (
 )
 
 func main() {
-	d := driver.Driver{}
-	err := jxstartup.StartServiceWithHandler(serviceName, device.Version, &d, restful.InitRestRoutes, staticPath)
+	driver.CurrentDriver = driver.Driver{}
+	err := jxstartup.StartServiceWithHandler(serviceName, device.Version, &driver.CurrentDriver, restful.InitRestRoutes, staticPath)
 	if err != nil {
 		panic(err)
 	}
