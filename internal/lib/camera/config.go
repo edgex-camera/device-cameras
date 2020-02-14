@@ -17,6 +17,10 @@ type CaptureConfig struct {
 	Enabled bool   `json:"enabled"`
 	Path    string `json:"path"`
 	Rate    int    `json:"rate"`
+
+	Storage bool `json:"storage"` // 是否采用定时存图功能
+	Seconds int  `json:"seconds"` // 存图间隔(s)
+	Number  int  `json:"number"`  // 存图数量
 }
 
 type VideoConfig struct {
