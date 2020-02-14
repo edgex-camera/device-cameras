@@ -16,7 +16,18 @@ type RawCamera struct {
 	CameraConfig    CameraConfig
 	processes       []process.Process
 	videoMaintainer *videoMaintainer
+	imageMaintainer *imageMaintainer
 	enabled         bool
+}
+
+type CameraConfig struct {
+	Enabled       bool   `json:"enabled"`
+	InputAddr     string `json:"input_addr"`
+	Auth          `json:"auth"`
+	StreamConfig  `json:"stream"`
+	CaptureConfig `json:"capture"`
+	VideoConfig   `json:"video"`
+	QualityConfig `json:"quality"`
 }
 
 func (c *RawCamera) Enable() {
@@ -45,6 +56,15 @@ func (c *RawCamera) Enable() {
 		}
 		c.videoMaintainer = videoMaintainer
 	}
+
+	if c.CameraConfig.CaptureConfig.Enabled && c.CameraConfig.CaptureConfig.Storage {
+		imageMaintainer, err := newImageMaintainer(c.Lc, c.CameraConfig.CaptureConfig.Path, c.CameraConfig.CaptureConfig.Seconds, c.CameraConfig.CaptureConfig.Number)
+		if err != nil {
+			c.Lc.Error(fmt.Sprintf("image maintainer init failed: %v", err.Error()))
+		}
+		c.imageMaintainer = imageMaintainer
+		c.imageMaintainer.start()
+	}
 }
 
 func (c *RawCamera) Disable(wait bool) {
@@ -69,6 +89,10 @@ func (c *RawCamera) Disable(wait bool) {
 	if c.videoMaintainer != nil {
 		c.videoMaintainer.stop()
 		c.videoMaintainer = nil
+	}
+	if c.imageMaintainer != nil {
+		c.imageMaintainer.stop()
+		c.imageMaintainer = nil
 	}
 }
 
@@ -102,4 +126,8 @@ func (c *RawCamera) GetVideoPaths() []string {
 
 func (c *RawCamera) GetStreamAddr() string {
 	return c.CameraConfig.StreamConfig.Address
+}
+
+func (c *RawCamera) GetImagePaths() []string {
+	return c.imageMaintainer.getFileList()
 }

@@ -16,7 +16,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gorilla/mux v1.6.2
-	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/satori/go.uuid v1.2.0
 	github.com/yakovlevdmv/Golang-iso8601-duration v0.0.0-20180403125811-e5db0413b903 // indirect
 	github.com/yakovlevdmv/WS-Discovery v0.0.0-20180512141937-16170c6c3677 // indirect
 	github.com/yakovlevdmv/goonvif v0.0.0-20180517145634-8181eb3ef2fb

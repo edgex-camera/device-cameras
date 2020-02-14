@@ -6,10 +6,10 @@ import (
 )
 
 func NewDevice(deviceName string) contract.Device {
-	deviceServiceName := "cameras"
+	deviceServiceName := "camera"
 	protocols := make(map[string]contract.ProtocolProperties)
 	protocolProperties := make(map[string]string)
-	protocolProperties["Address"] = "/api/v1/device/cameras"
+	protocolProperties["Address"] = "/api/v1/device/camera"
 	protocols["other"] = protocolProperties
 	return contract.Device{
 		Name:           deviceName,
