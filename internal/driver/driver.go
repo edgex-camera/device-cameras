@@ -1,6 +1,12 @@
 package driver
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"strconv"
+	"time"
+
 	dsModels "github.com/edgexfoundry/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
 	contract "github.com/edgexfoundry/go-mod-core-contracts/models"
@@ -27,11 +33,63 @@ func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *dsModels.As
 }
 
 func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]contract.ProtocolProperties, reqs []dsModels.CommandRequest) (res []*dsModels.CommandValue, err error) {
+	d.lc.Info(fmt.Sprint("Read command of device: ", deviceName))
+	now := time.Now().UnixNano()
+	for _, req := range reqs {
+		switch req.DeviceResourceName {
+		case "capture_path":
+			{
+				capturePath := d.JDevices[deviceName].Camera.GetCapturePath()
+				capturePathJson, _ := json.Marshal(map[string]interface{}{"capture_path": capturePath})
+				cv := dsModels.NewStringValue(reqs[0].DeviceResourceName, now, string(capturePathJson))
+				res = append(res, cv)
+			}
+		case "stream_addr":
+			{
+				streamAddr := d.JDevices[deviceName].Camera.GetStreamAddr()
+				streamAddrJson, _ := json.Marshal(map[string]interface{}{"stream_addr": streamAddr})
+				cv := dsModels.NewStringValue(reqs[0].DeviceResourceName, now, string(streamAddrJson))
+				res = append(res, cv)
+			}
+		case "video_paths":
+			{
+				videoPaths := d.JDevices[deviceName].Camera.GetVideoPaths()
+				videoPathsJson, _ := json.Marshal(map[string]interface{}{"video_paths": videoPaths})
+				cv := dsModels.NewStringValue(reqs[0].DeviceResourceName, now, string(videoPathsJson))
+				res = append(res, cv)
+			}
+		case "image_paths":
+			{
+				imagePaths := d.JDevices[deviceName].Camera.GetImagePaths()
+				imagePathsJson, _ := json.Marshal(map[string]interface{}{"image_paths": imagePaths})
+				cv := dsModels.NewStringValue(reqs[0].DeviceResourceName, now, string(imagePathsJson))
+				res = append(res, cv)
+			}
+		case "config":
+			{
+				cv := dsModels.NewStringValue(reqs[0].DeviceResourceName, now, string(d.JDevices[deviceName].Camera.GetConfigure()))
+				res = append(res, cv)
+			}
+		case "channels":
+			{
+				channels := d.JDevices[deviceName].Camera.ListChannels()
+				channelsJson, _ := json.Marshal(map[string]interface{}{"channels": channels})
+				cv := dsModels.NewStringValue(reqs[0].DeviceResourceName, now, string(channelsJson))
+				res = append(res, cv)
+			}
+		case "presets":
+
+		}
+	}
 	return nil, err
 }
 
 func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]contract.ProtocolProperties, reqs []dsModels.CommandRequest, params []*dsModels.CommandValue) error {
+	d.lc.Info(fmt.Sprintf("HandleWriteCommands %s", params[0].DeviceResourceName))
+	start := time.Now()
+
 	if deviceName == CAMERA_FACTORY {
+		// 设备增删
 		for _, param := range params {
 			switch param.DeviceResourceName {
 			case "add_device", "device_type":
@@ -59,7 +117,58 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 				return d.RemoveJdevice(v)
 			}
 		}
+	} else {
+		// 摄像头操作
+		for _, param := range params {
+			switch param.DeviceResourceName {
+			case "config":
+				return d.HandleWriteConfigCommand(deviceName, param)
+			default:
+				if d.JDevices[deviceName].Onvif == nil {
+					return errors.New("Current device does not support onvif")
+				}
+				moveHandled := false
+
+				var err error
+				switch param.DeviceResourceName {
+				case "pan", "tilt", "zoom", "timeout":
+					if !moveHandled {
+						moveHandled = true
+						err = d.HandleMoveCommand(deviceName, params)
+					}
+				case "stop":
+					err = d.JDevices[deviceName].Onvif.Stop()
+				case "set_home_position":
+					err = d.JDevices[deviceName].Onvif.SetHomePosition()
+				case "reset_position":
+					err = d.JDevices[deviceName].Onvif.Reset()
+				case "set_preset":
+					{
+						v, err := param.StringValue()
+						vint, err := strconv.ParseInt(v, 10, 64)
+						if err != nil {
+							return err
+						}
+						err = d.JDevices[deviceName].Onvif.SetPreset(vint)
+					}
+				case "goto_preset":
+					{
+						v, err := param.StringValue()
+						vint, err := strconv.ParseInt(v, 10, 64)
+						if err != nil {
+							return err
+						}
+						err = d.JDevices[deviceName].Onvif.GotoPreset(vint)
+					}
+				}
+				if err != nil {
+					return err
+				}
+			}
+		}
 	}
+	elapsed := time.Since(start)
+	d.lc.Info(fmt.Sprintf("HandleWriteCommands took %s", elapsed))
 	return nil
 }
 
