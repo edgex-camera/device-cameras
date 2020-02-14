@@ -31,6 +31,10 @@ func (h *handler) respSuccess(body interface{}, w http.ResponseWriter) {
 	if body == nil {
 		return
 	}
+	if value, ok := body.([]byte); ok {
+		body = string(value)
+	}
+
 	resp := baseResponse{Data: body, Message: "success"}
 	h.respWithStatusCode(resp, w, 200)
 }

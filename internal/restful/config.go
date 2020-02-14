@@ -1,9 +1,11 @@
 package restful
 
 import (
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/driver"
 )
 
 func appendConfigRoute(r *mux.Router, h *handler) {
@@ -17,10 +19,22 @@ func appendConfigRoute(r *mux.Router, h *handler) {
 
 //获取camera配置
 func (h *handler) getCameraConfig(w http.ResponseWriter, r *http.Request) {
-
+	JDevice := driver.CurrentDriver.JDevices[getCameraName(r)]
+	cameraConfigure := JDevice.Camera.GetConfigure()
+	h.respSuccess(cameraConfigure, w)
 }
 
 //修改camera配置
 func (h *handler) postModifyCameraConfig(w http.ResponseWriter, r *http.Request) {
-
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		h.respFailed(err, w)
+	}
+	JDevice := driver.CurrentDriver.JDevices[getCameraName(r)]
+	err = JDevice.Camera.MergeConfig(data)
+	if err != nil {
+		h.respFailed(err, w)
+	}
+	mergedConfigure := JDevice.Camera.GetCapturePath()
+	h.respSuccess(mergedConfigure, w)
 }
