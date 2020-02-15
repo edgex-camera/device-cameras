@@ -168,10 +168,6 @@ func (h *handler) postGotoPresetPosition(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *handler) checkOnvifAndDo(deviceName string, jOnvif jdevice.Onvif, w http.ResponseWriter, toDo func(jOnvif jdevice.Onvif) error) {
-	// var number int64 = 0
-	// if v, ok := presetNumber.(int64); ok {
-	// 	number = v
-	// }
 	if jOnvif == nil {
 		h.respFailed(fmt.Errorf("this %s devicee not support onvif", deviceName), w)
 		return
