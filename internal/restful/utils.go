@@ -49,7 +49,7 @@ func getCameraName(r *http.Request) string {
 
 func getDeviceType(r *http.Request) string {
 	vars := mux.Vars(r)
-	return vars["camera_name"]
+	return vars["device_type"]
 }
 
 func getPresetNumber(r *http.Request) (int64, error) {

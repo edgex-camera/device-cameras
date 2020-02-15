@@ -159,7 +159,6 @@ func (h *handler) postGotoPresetPosition(w http.ResponseWriter, r *http.Request)
 	deviceName := "deviceName"
 	h.checkOnvifAndDo(
 		deviceName,
-		// presetNumber,
 		driver.CurrentDriver.JDevices[deviceName].Onvif,
 		w,
 		func(jOnvif jdevice.Onvif) error {
