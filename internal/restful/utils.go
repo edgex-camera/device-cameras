@@ -3,6 +3,7 @@ package restful
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -49,4 +50,9 @@ func getCameraName(r *http.Request) string {
 func getDeviceType(r *http.Request) string {
 	vars := mux.Vars(r)
 	return vars["camera_name"]
+}
+
+func getPresetNumber(r *http.Request) (int64, error) {
+	vars := mux.Vars(r)
+	return strconv.ParseInt(vars["preset_number"], 10, 64)
 }
