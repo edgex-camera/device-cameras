@@ -28,9 +28,6 @@ func (h *handler) respWithStatusCode(resp interface{}, w http.ResponseWriter, st
 
 //返回成功
 func (h *handler) respSuccess(body interface{}, w http.ResponseWriter) {
-	if body == nil {
-		return
-	}
 	if value, ok := body.([]byte); ok {
 		body = string(value)
 	}
