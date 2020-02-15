@@ -62,18 +62,32 @@ func (h *handler) getCameraInfo(w http.ResponseWriter, r *http.Request) {
 
 //添加camera
 func (h *handler) postAddCamera(w http.ResponseWriter, r *http.Request) {
-	driver.CurrentDriver.AddJdevice(getCameraName(r), getDeviceType(r))
-
+	err := driver.CurrentDriver.AddJdevice(getCameraName(r), getDeviceType(r))
+	if err != nil {
+		h.respFailed(err, w)
+		return
+	}
+	h.respSuccess(nil, w)
 }
 
 //删除camera
 func (h *handler) deleteRemoveCamera(w http.ResponseWriter, r *http.Request) {
-	driver.CurrentDriver.RemoveJdevice(getCameraName(r))
+	err := driver.CurrentDriver.RemoveJdevice(getCameraName(r))
+	if err != nil {
+		h.respFailed(err, w)
+		return
+	}
+	h.respSuccess(nil, w)
 }
 
 //删除所有摄像头
 func (h *handler) deleteRemoveAllCamera(w http.ResponseWriter, r *http.Request) {
 	for _, jDevice := range driver.CurrentDriver.JDevices {
-		driver.CurrentDriver.RemoveJdevice(jDevice.Name)
+		err := driver.CurrentDriver.RemoveJdevice(jDevice.Name)
+		if err != nil {
+			h.respFailed(err, w)
+			return
+		}
 	}
+	h.respSuccess(nil, w)
 }
