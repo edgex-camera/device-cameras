@@ -131,7 +131,7 @@ func (c *OnvifCamera) SetPreset(number int64) error {
 	if number == int64(1) {
 		return errors.New("cannot set preset 1, it is home position")
 	}
-	setPreset(number)
+	setPreset(c.Name, number)
 	req := PTZ.SetPreset{
 		ProfileToken: c.profileToken,
 		PresetToken:  numberToToken(number),
