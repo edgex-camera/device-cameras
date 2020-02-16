@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 
+	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/utils"
 )
 
@@ -47,6 +48,11 @@ func (nc *NormalCamera) MergeConfig(configPatch []byte) error {
 
 func (nc *NormalCamera) GetConfigure() []byte {
 	return nc.Camera.GetConfigure()
+}
+
+func (nc *NormalCamera) PutConfig(config []byte) error {
+	configName := nc.Name + "/camera/" + nc.ChannelId
+	return jxstartup.PutDriverConfig(configName, config)
 }
 
 func (nc *NormalCamera) AddChannel() error {
