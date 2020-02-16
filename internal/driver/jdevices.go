@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/edgexfoundry/device-sdk-go"
 	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice"
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice/normalcam"
@@ -12,6 +13,8 @@ import (
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/onvif"
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/utils"
 )
+
+const ALL_DEVICES_KEY = "all_devices"
 
 // 设备类型
 const NORMAL_CAMERA = "normal-camera"     // 普通usb/ip摄像头
@@ -68,7 +71,7 @@ func (d *Driver) AddJdevice(deviceName, deviceType string) error {
 	}
 
 	d.JDevices[deviceName] = jDevice
-	return setupJdeviceConfig(jDevice)
+	return setupJdeviceConfig(jDevice, true)
 }
 
 // Remove Jdevice
@@ -77,14 +80,38 @@ func (d *Driver) RemoveJdevice(deviceName string) error {
 		d.lc.Info(fmt.Sprintf("Device to remove is not running "), deviceName)
 	} else {
 		d.JDevices[deviceName].Camera.Disable(true)
-		// TODO
+		err := setupJdeviceConfig(d.JDevices[deviceName], false)
+		if err != nil {
+			return err
+		}
+		delete(d.JDevices, deviceName)
 	}
 	return nil
 }
 
 // JDevice基础信息
-func setupJdeviceConfig(jDevice jdevice.JDevice) error {
+func setupJdeviceConfig(jDevice jdevice.JDevice, enabled bool) error {
+	// 修改all_devices配置信息
+	allDevices := []byte{}
+	allDevicesMap := make(map[string]bool)
+	if all, ok := device.DriverConfigs()[ALL_DEVICES_KEY]; ok {
+		allDevices = []byte(all)
+		json.Unmarshal(allDevices, allDevicesMap)
+	}
+	if enabled {
+		allDevicesMap[jDevice.Name] = true
+	} else {
+		delete(allDevicesMap, jDevice.Name)
+	}
+	allDevices, _ = json.Marshal(allDevicesMap)
+	err := jxstartup.PutDriverConfig(ALL_DEVICES_KEY, allDevices)
+	if err != nil {
+		return err
+	}
+
+	// 修改device自身配置
 	config := jdevice.JDeviceConfig{}
+	config.Enabled = enabled
 	config.Name = jDevice.Name
 	config.Id = jDevice.Id
 	if jDevice.Onvif != nil {

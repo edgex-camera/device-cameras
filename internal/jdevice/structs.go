@@ -8,7 +8,8 @@ type JDevice struct {
 }
 
 type JDeviceConfig struct {
-	Name  string `json:"name"`
-	Id    string `json:"id"`
-	Onvif bool   `json:"onvif"`
+	Enabled bool   `json:enabled`
+	Name    string `json:"name"`
+	Id      string `json:"id"`
+	Onvif   bool   `json:"onvif"`
 }
