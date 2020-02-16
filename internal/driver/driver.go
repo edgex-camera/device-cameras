@@ -126,7 +126,13 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 		for _, param := range params {
 			switch param.DeviceResourceName {
 			case "config":
-				return d.HandleWriteConfigCommand(deviceName, param)
+				{
+					v, err := param.StringValue()
+					if err != nil {
+						return err
+					}
+					return d.JDevices[deviceName].Camera.PutConfig([]byte(v))
+				}
 			default:
 				if d.JDevices[deviceName].Onvif == nil {
 					return errors.New("Current device does not support onvif")
