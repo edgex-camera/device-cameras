@@ -2,10 +2,12 @@ package restful
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/driver"
 )
 
 //基本responce 结构
@@ -55,4 +57,40 @@ func getDeviceType(r *http.Request) string {
 func getPresetNumber(r *http.Request) (int64, error) {
 	vars := mux.Vars(r)
 	return strconv.ParseInt(vars["preset_number"], 10, 64)
+}
+
+func (h *handler) checkDeviceMiddvare(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		deviceName := getCameraName(r)
+		_, ok := driver.CurrentDriver.JDevices[deviceName]
+		if !ok {
+			h.respFailed(fmt.Errorf("has not device %s", deviceName), w)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (h *handler) checkOnvifMiddvare(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		deviceName := getCameraName(r)
+
+		if driver.CurrentDriver.JDevices[deviceName].Onvif == nil {
+			h.respFailed(fmt.Errorf("this %s devicee not support onvif", deviceName), w)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (h *handler) checkCameraMiddvare(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		deviceName := getCameraName(r)
+
+		if driver.CurrentDriver.JDevices[deviceName].Camera == nil {
+			h.respFailed(fmt.Errorf("this %s devicee not support camera", deviceName), w)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
