@@ -74,7 +74,7 @@ func (h *handler) postOnvifMove(w http.ResponseWriter, r *http.Request) {
 		Zoom: req.Zoom,
 	}
 
-	h.checkOnvifAndDo(
+	h.onvifDo(
 		driver.CurrentDriver.JDevices[getCameraName(r)].Onvif,
 		w,
 		func(jOnvif jdevice.Onvif) error {
@@ -84,7 +84,7 @@ func (h *handler) postOnvifMove(w http.ResponseWriter, r *http.Request) {
 
 //停止
 func (h *handler) postOnvifStop(w http.ResponseWriter, r *http.Request) {
-	h.checkOnvifAndDo(
+	h.onvifDo(
 		driver.CurrentDriver.JDevices[getCameraName(r)].Onvif,
 		w,
 		func(jOnvif jdevice.Onvif) error {
@@ -94,7 +94,7 @@ func (h *handler) postOnvifStop(w http.ResponseWriter, r *http.Request) {
 
 //设置零点
 func (h *handler) postSetHomePosition(w http.ResponseWriter, r *http.Request) {
-	h.checkOnvifAndDo(
+	h.onvifDo(
 		driver.CurrentDriver.JDevices[getCameraName(r)].Onvif,
 		w,
 		func(jOnvif jdevice.Onvif) error {
@@ -104,7 +104,7 @@ func (h *handler) postSetHomePosition(w http.ResponseWriter, r *http.Request) {
 
 //回到零点
 func (h *handler) postResetPosition(w http.ResponseWriter, r *http.Request) {
-	h.checkOnvifAndDo(
+	h.onvifDo(
 		driver.CurrentDriver.JDevices[getCameraName(r)].Onvif,
 		w,
 		func(jOnvif jdevice.Onvif) error {
@@ -120,7 +120,7 @@ func (h *handler) postSetPresetPosition(w http.ResponseWriter, r *http.Request) 
 		h.respFailed(fmt.Errorf("err posittion number %v", presetNumber), w)
 		return
 	}
-	h.checkOnvifAndDo(
+	h.onvifDo(
 		driver.CurrentDriver.JDevices[getCameraName(r)].Onvif,
 		w,
 		func(jOnvif jdevice.Onvif) error {
@@ -135,7 +135,7 @@ func (h *handler) postGotoPresetPosition(w http.ResponseWriter, r *http.Request)
 		h.respFailed(fmt.Errorf("err posittion number %v", presetNumber), w)
 		return
 	}
-	h.checkOnvifAndDo(
+	h.onvifDo(
 		driver.CurrentDriver.JDevices[getCameraName(r)].Onvif,
 		w,
 		func(jOnvif jdevice.Onvif) error {
@@ -143,7 +143,7 @@ func (h *handler) postGotoPresetPosition(w http.ResponseWriter, r *http.Request)
 		})
 }
 
-func (h *handler) checkOnvifAndDo(onvif jdevice.Onvif, w http.ResponseWriter, toDo func(jOnvif jdevice.Onvif) error) {
+func (h *handler) onvifDo(onvif jdevice.Onvif, w http.ResponseWriter, toDo func(jOnvif jdevice.Onvif) error) {
 
 	err := toDo(onvif)
 	if err != nil {
