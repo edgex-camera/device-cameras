@@ -12,10 +12,9 @@ import (
 func appendCameraResourcesRoute(r *mux.Router, h *handler) {
 	prefix := "/source"
 	subRouter := r.PathPrefix(prefix).Subrouter()
-
-	subRouter.Path("/video_paths").HandlerFunc(h.getVideoPaths).Methods(http.MethodGet)
-	subRouter.Path("/images").HandlerFunc(h.getImageURls).Methods(http.MethodGet)
-	subRouter.Path("/vidoes").HandlerFunc(h.getVideoURLs).Methods(http.MethodGet)
+	subRouter.Path("/{camera_name}/video_paths").HandlerFunc(h.getVideoPaths).Methods(http.MethodGet)
+	subRouter.Path("/{camera_name}/images").HandlerFunc(h.getImageURls).Methods(http.MethodGet)
+	subRouter.Path("/{camera_name}/vidoes").HandlerFunc(h.getVideoURLs).Methods(http.MethodGet)
 }
 
 //获取视频存储路径
@@ -23,16 +22,15 @@ func (h *handler) getVideoPaths(w http.ResponseWriter, r *http.Request) {
 	type responce struct {
 		VideoPaths []string `json:"videopaths"`
 	}
-	deviceName := "deviceName"
+	cameraName := getCameraName(r)
 	h.checkCamerAndDo(
-		deviceName,
-		driver.CurrentDriver.JDevices[deviceName].Camera,
+		cameraName,
+		driver.CurrentDriver.JDevices,
 		w,
 		func(c jdevice.Camera) interface{} {
-			resp := responce{
+			return responce{
 				VideoPaths: c.GetVideoPaths(),
 			}
-			return resp
 		})
 
 }
@@ -42,16 +40,15 @@ func (h *handler) getImageURls(w http.ResponseWriter, r *http.Request) {
 	type responce struct {
 		ImageURLs []string `json:"imageurls"`
 	}
-	deviceName := "deviceName"
+	cameraName := getCameraName(r)
 	h.checkCamerAndDo(
-		deviceName,
-		driver.CurrentDriver.JDevices[deviceName].Camera,
+		cameraName,
+		driver.CurrentDriver.JDevices,
 		w,
 		func(c jdevice.Camera) interface{} {
-			resp := responce{
+			return responce{
 				ImageURLs: c.GetImagePaths(),
 			}
-			return resp
 		})
 }
 
@@ -60,25 +57,29 @@ func (h *handler) getVideoURLs(w http.ResponseWriter, r *http.Request) {
 	type responce struct {
 		VideoURLs []string `json:"videourls"`
 	}
-	deviceName := "deviceName"
+	cameraName := getCameraName(r)
 	h.checkCamerAndDo(
-		deviceName,
-		driver.CurrentDriver.JDevices[deviceName].Camera,
+		cameraName,
+		driver.CurrentDriver.JDevices,
 		w,
 		func(c jdevice.Camera) interface{} {
-			resp := responce{
+			return responce{
 				VideoURLs: c.GetVideoPaths(),
 			}
-			return resp
 		})
 
 }
 
-func (h *handler) checkCamerAndDo(deviceName string, camera jdevice.Camera, w http.ResponseWriter, getResp func(c jdevice.Camera) interface{}) {
-	if camera == nil {
-		h.respFailed(fmt.Errorf("%s has not camera", deviceName), w)
+func (h *handler) checkCamerAndDo(deviceName string, jDevices map[string]jdevice.JDevice, w http.ResponseWriter, getResp func(c jdevice.Camera) interface{}) {
+	device, ok := jDevices[deviceName]
+	if !ok {
+		h.respFailed(fmt.Errorf("has not device %s", deviceName), w)
 		return
 	}
-	resp := getResp(camera)
+	if device.Camera == nil {
+		h.respFailed(fmt.Errorf("%s has not support camera", deviceName), w)
+		return
+	}
+	resp := getResp(device.Camera)
 	h.respSuccess(resp, w)
 }
