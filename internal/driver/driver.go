@@ -78,7 +78,11 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]cont
 				res = append(res, cv)
 			}
 		case "presets":
-
+			{
+				presets := d.JDevices[deviceName].Onvif.GetPresets()
+				cv := dsModels.NewStringValue(reqs[0].DeviceResourceName, now, presets)
+				res = append(res, cv)
+			}
 		}
 	}
 	return nil, err
