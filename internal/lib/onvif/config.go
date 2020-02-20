@@ -21,6 +21,6 @@ func (c *OnvifCamera) MergeConfig(configPatch []byte) error {
 }
 
 func (c *OnvifCamera) PutConfig(config []byte) error {
-	configName := c.Name + "/onvif/config"
+	configName := c.Name + ".onvif.config"
 	return jxstartup.PutDriverConfig(configName, config)
 }

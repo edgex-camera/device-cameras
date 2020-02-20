@@ -98,21 +98,23 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 			switch param.DeviceResourceName {
 			case "add_device", "device_type":
 				var name, deviceType string
-				switch param.DeviceResourceName {
-				case "add_device":
-					v, err := param.StringValue()
-					if err != nil {
-						return err
+				for _, param := range params {
+					switch param.DeviceResourceName {
+					case "add_device":
+						v, err := param.StringValue()
+						if err != nil {
+							return err
+						}
+						name = v
+					case "device_type":
+						v, err := param.StringValue()
+						if err != nil {
+							return err
+						}
+						deviceType = v
 					}
-					name = v
-				case "device_type":
-					v, err := param.StringValue()
-					if err != nil {
-						return err
-					}
-					deviceType = v
-					return d.AddJdevice(name, deviceType)
 				}
+				return d.AddJdevice(name, deviceType)
 			case "remove_device":
 				v, err := param.StringValue()
 				if err != nil {

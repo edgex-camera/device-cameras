@@ -123,7 +123,7 @@ func (c *OnvifCamera) Reset() error {
 
 func (c *OnvifCamera) GetPresets() string {
 	c.Lc.Info("get presets info")
-	return getPresets()
+	return getPresets(c.Name)
 }
 
 func (c *OnvifCamera) SetPreset(number int64) error {

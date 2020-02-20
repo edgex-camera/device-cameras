@@ -47,14 +47,14 @@ func InitPresetsConfig(name string) {
 	jxstartup.PutDriverConfig(configName, config)
 }
 
-func getPresets() string {
-	return device.DriverConfigs()["presets"]
+func getPresets(name string) string {
+	return device.DriverConfigs()[name+".onvif.presets"]
 }
 
 func setPreset(name string, number int64) {
-	configName := name + "/onvif/presets"
+	configName := name + ".onvif.presets"
 	InitPresetsConfig(name)
-	current := []byte(device.DriverConfigs()["presets"])
+	current := []byte(device.DriverConfigs()[configName])
 	current_map := make(map[int64]bool)
 	json.Unmarshal(current, &current_map)
 

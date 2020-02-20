@@ -35,7 +35,7 @@ func (d *Driver) AddJdevice(deviceName, deviceType string) error {
 		return err
 	}
 
-	jDevice := jdevice.JDevice{Id: id, Type: deviceType}
+	jDevice := jdevice.JDevice{Id: id, Type: deviceType, Name: deviceName}
 
 	// 普通摄像头、onvif摄像头的摄像头部分
 	if deviceType == NORMAL_CAMERA || deviceType == ONVIF_CAMERA {
@@ -79,14 +79,17 @@ func (d *Driver) RemoveJdevice(deviceName string) error {
 	if _, ok := d.JDevices[deviceName]; !ok {
 		d.lc.Info(fmt.Sprintf("Device to remove is not running "), deviceName)
 	} else {
-		d.JDevices[deviceName].Camera.Disable(true)
-		err := setupJdeviceConfig(d.JDevices[deviceName], false, d.JDevices[deviceName].Type)
-		if err != nil {
-			return err
+		if d.JDevices[deviceName].Camera != nil {
+			d.JDevices[deviceName].Camera.Disable(true)
 		}
 		delete(d.JDevices, deviceName)
 	}
-	return nil
+	jDevice := jdevice.JDevice{Name: deviceName}
+	err := setupJdeviceConfig(jDevice, false, "")
+	if err != nil {
+		return err
+	}
+	return jxstartup.Service.RemoveDeviceByName(deviceName)
 }
 
 // JDevice基础信息
@@ -98,9 +101,9 @@ func setupJdeviceConfig(jDevice jdevice.JDevice, enabled bool, deviceType string
 		allDevices = []byte(all)
 		json.Unmarshal(allDevices, &allDevicesMap)
 	}
-	if enabled {
-		allDevicesMap[jDevice.Name] = true
-	} else {
+
+	allDevicesMap[jDevice.Name] = enabled
+	if !enabled {
 		delete(allDevicesMap, jDevice.Name)
 	}
 	allDevices, _ = json.Marshal(allDevicesMap)
@@ -118,10 +121,7 @@ func setupJdeviceConfig(jDevice jdevice.JDevice, enabled bool, deviceType string
 	if jDevice.Onvif != nil {
 		config.Onvif = true
 	}
-	configBytes, err := json.Marshal(config)
-	if err != nil {
-		return err
-	}
-	configName := config.Name + "/" + "basic"
+	configName := config.Name
+	configBytes, _ := json.Marshal(config)
 	return jxstartup.PutDriverConfig(configName, configBytes)
 }

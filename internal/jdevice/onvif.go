@@ -23,7 +23,7 @@ func NewOnvif(name string, lc logger.LoggingClient, config onvif.OnvifConfig) (O
 }
 
 func SetupOnvifConfig(onvif Onvif, name string) error {
-	configName := name + "/onvif/config"
+	configName := name + ".onvif.config"
 	if _, ok := device.DriverConfigs()[configName]; !ok {
 		config, _ := json.Marshal(onvif)
 		return jxstartup.PutDriverConfig(configName, config)
