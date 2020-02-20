@@ -42,7 +42,7 @@ func NewRawCamera(name, channelId string, lc logger.LoggingClient, cmder camera.
 }
 
 func SetupRawCameraConfig(c camera.RawCamera, name, channelId string) error {
-	configName := name + "/camera/" + channelId
+	configName := name + ".camera." + channelId
 	if _, ok := device.DriverConfigs()[configName]; !ok {
 		return jxstartup.PutDriverConfig(configName, c.GetConfigure())
 	}

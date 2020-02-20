@@ -12,6 +12,8 @@ import (
 )
 
 func (d *Driver) OnvifConfigChange(oldConf map[string]string, newConf map[string]string) {
+	fmt.Println("<<<<<<<<<<<<<<<<<<<", oldConf)
+	fmt.Println("<<<<<<<<<<<<<<<<<<<", newConf)
 	allDevices, ok := newConf[ALL_DEVICES_KEY]
 	// 无任何设备
 	if !ok {
@@ -36,6 +38,7 @@ func (d *Driver) OnvifConfigChange(oldConf map[string]string, newConf map[string
 }
 
 func (d *Driver) addOrModDeviceByConfig(deviceName, conf string) {
+	fmt.Println("<<<<<<<<<<<<<<<<<< Conf: ", conf)
 	confMap := make(map[string]string)
 	json.Unmarshal([]byte(conf), &confMap)
 
