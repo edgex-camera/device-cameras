@@ -2,7 +2,7 @@
 LogLevel = 'INFO'
 
 [Service]
-Host = "edgex-device-cameras"
+Host = "172.17.0.1"
 Port = 49998
 ConnectRetries = 20
 Labels = []
