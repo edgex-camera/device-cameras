@@ -1,6 +1,8 @@
 package normalcam
 
 import (
+	"encoding/json"
+
 	"github.com/edgexfoundry/device-sdk-go"
 	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
@@ -42,6 +44,16 @@ func NewRawCamera(name, channelId string, lc logger.LoggingClient, cmder camera.
 }
 
 func SetupRawCameraConfig(c camera.RawCamera, name, channelId string) error {
+	// 更新摄像头channel map
+	basicConfName := name + ".camera"
+	basicJson, _ := json.Marshal(map[string]bool{channelId: true})
+	if string(basicJson) != device.DriverConfigs()[basicConfName] {
+		err := jxstartup.PutDriverConfig(basicConfName, basicJson)
+		if err != nil {
+			return err
+		}
+	}
+
 	configName := name + ".camera." + channelId
 	if _, ok := device.DriverConfigs()[configName]; !ok {
 		return jxstartup.PutDriverConfig(configName, c.GetConfigure())

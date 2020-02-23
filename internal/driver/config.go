@@ -11,9 +11,8 @@ import (
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/onvif"
 )
 
-func (d *Driver) OnvifConfigChange(oldConf map[string]string, newConf map[string]string) {
-	fmt.Println("<<<<<<<<<<<<<<<<<<<", oldConf)
-	fmt.Println("<<<<<<<<<<<<<<<<<<<", newConf)
+func (d *Driver) OnConfigChange(oldConf map[string]string, newConf map[string]string) {
+	d.lc.Info("Config changed ...")
 	allDevices, ok := newConf[ALL_DEVICES_KEY]
 	// 无任何设备
 	if !ok {
@@ -23,26 +22,46 @@ func (d *Driver) OnvifConfigChange(oldConf map[string]string, newConf map[string
 	allDevicesMap := make(map[string]bool)
 	json.Unmarshal([]byte(allDevices), &allDevicesMap)
 
+	// 在deviceMap中的处理
 	for deviceName := range allDevicesMap {
 		_, ok := d.JDevices[deviceName]
-		if ok {
-			// 目前运行设备配置与旧配置相同，不对设备做操作
-			if newConf[deviceName] != oldConf[deviceName] {
-				d.addOrModDeviceByConfig(deviceName, newConf[deviceName])
-			}
-		} else {
+		if !ok {
 			// 目前未运行该设备，根据配置加入
-			d.addOrModDeviceByConfig(deviceName, newConf[deviceName])
+			d.addOrModDeviceByConfig(deviceName, newConf)
+		} else if d.cameraConfigChanged(deviceName, oldConf, newConf) {
+			// 目前配置与旧配置不同，根据配置修改
+			d.addOrModDeviceByConfig(deviceName, newConf)
+		}
+	}
+
+	// 在jdevices中，但配置中没有的
+	for name := range d.JDevices {
+		if _, ok := allDevicesMap[name]; !ok {
+			d.RemoveJdevice(name)
 		}
 	}
 }
 
-func (d *Driver) addOrModDeviceByConfig(deviceName, conf string) {
-	fmt.Println("<<<<<<<<<<<<<<<<<< Conf: ", conf)
-	confMap := make(map[string]string)
-	json.Unmarshal([]byte(conf), &confMap)
+func (d *Driver) cameraConfigChanged(deviceName string, oldConf, newConf map[string]string) bool {
+	basicConfName := deviceName + ".camera"
+	if oldConf[basicConfName] != newConf[basicConfName] {
+		return true
+	}
+	channelsMap := make(map[string]bool)
+	json.Unmarshal([]byte(newConf[basicConfName]), &channelsMap)
+	for channelId := range channelsMap {
+		channelConfName := deviceName + ".camera." + channelId
+		if oldConf[channelConfName] != newConf[channelConfName] {
+			return true
+		}
+	}
+	return false
+}
 
-	basicStr, ok := confMap["basic"]
+func (d *Driver) addOrModDeviceByConfig(deviceName string, conf map[string]string) {
+	d.lc.Info(fmt.Sprint("Adding device: ", deviceName))
+
+	basicStr, ok := conf[deviceName]
 	if !ok {
 		d.lc.Info(fmt.Sprintf("Device with name %v config does not have basic.", deviceName))
 		return
@@ -60,7 +79,7 @@ func (d *Driver) addOrModDeviceByConfig(deviceName, conf string) {
 
 	// 创建onvif实例
 	if basicConf.Onvif {
-		onvifStr, ok := confMap["onvif"]
+		onvifStr, ok := conf[deviceName+".onvif.config"]
 		if !ok {
 			d.lc.Info(fmt.Sprintf("Device with name %v onvif config not exists.", deviceName))
 			return
@@ -76,7 +95,7 @@ func (d *Driver) addOrModDeviceByConfig(deviceName, conf string) {
 	}
 
 	// 创建camera实例
-	cameraStr, ok := confMap["camera"]
+	cameraStr, ok := conf[deviceName+".camera"]
 	if !ok {
 		d.lc.Info(fmt.Sprintf("Device with name %v camera config not exists.", deviceName))
 		return
@@ -90,11 +109,11 @@ func (d *Driver) addOrModDeviceByConfig(deviceName, conf string) {
 		}
 		cc := camera.CameraConfig{}
 		var channelId string
-		cameraMap := make(map[string]string)
-		json.Unmarshal([]byte(cameraStr), &cameraMap)
-		for id := range cameraMap {
+		channelsMap := make(map[string]bool)
+		json.Unmarshal([]byte(cameraStr), &channelsMap)
+		for id := range channelsMap {
 			channelId = id
-			json.Unmarshal([]byte(cameraMap[id]), &cc)
+			json.Unmarshal([]byte(conf[deviceName+".camera."+channelId]), &cc)
 		}
 		deviceCamera, err := normalcam.NewCamera(deviceName, channelId, d.lc, deviceCmder, cc)
 		if err != nil {
@@ -103,7 +122,7 @@ func (d *Driver) addOrModDeviceByConfig(deviceName, conf string) {
 		}
 		jDevice.Camera = deviceCamera
 		// 运行camera
-		deviceCamera.MergeConfig([]byte(cameraMap[channelId]))
+		deviceCamera.MergeConfig([]byte(conf[deviceName+".camera."+channelId]))
 		// 将jDevice加入到driver
 		d.JDevices[deviceName] = jDevice
 	}
