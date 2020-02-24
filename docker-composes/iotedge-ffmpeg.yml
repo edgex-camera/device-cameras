@@ -1,0 +1,23 @@
+worker_node:
+  service_name: app-jx-cameras
+  portname: port9995
+  arch: ["arm64v8"]
+  engine: "docker-compose"
+  yaml:
+    version: '3'
+    services:
+      edgex-device-cameras:
+        image: edgex-cameras-ffmpeg
+        container_name: edgex-device-cameras
+        hostname: edgex-device-cameras
+        restart: always
+        volumes:
+          - /tmp:/tmp
+          - /data/tmpfs:/data/tmpfs
+          - /sys:/sys
+        command: --pm ffmpeg
+        privileged: true
+    networks:
+      default:
+        external:
+          name: edgex
