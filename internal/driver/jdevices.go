@@ -57,11 +57,11 @@ func (d *Driver) AddJdevice(deviceName, deviceType string) error {
 	// onvif摄像头onvif部分
 	if deviceType == ONVIF_CAMERA {
 		config := onvif.OnvifConfig{}
-		deviceOnvif, err := jdevice.NewOnvif(deviceName, d.lc, config)
+		deviceControl, err := jdevice.NewOnvif(deviceName, d.lc, config)
 		if err != nil {
 			return err
 		}
-		jDevice.Onvif = deviceOnvif
+		jDevice.Control = deviceControl
 	}
 	if deviceType == DUAL_USB_CAMERA {
 
@@ -118,8 +118,10 @@ func setupJdeviceConfig(jDevice jdevice.JDevice, enabled bool, deviceType string
 	config.Name = jDevice.Name
 	config.Id = jDevice.Id
 	config.Type = deviceType
-	if jDevice.Onvif != nil {
-		config.Onvif = true
+	if deviceType == ONVIF_CAMERA {
+		config.Control = "onvif"
+	} else {
+		config.Control = "none"
 	}
 	configName := config.Name
 	configBytes, _ := json.Marshal(config)

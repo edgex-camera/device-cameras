@@ -79,7 +79,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]cont
 			}
 		case "presets":
 			{
-				presets := d.JDevices[deviceName].Onvif.GetPresets()
+				presets := d.JDevices[deviceName].Control.GetPresets()
 				cv := dsModels.NewStringValue(reqs[0].DeviceResourceName, now, presets)
 				res = append(res, cv)
 			}
@@ -136,8 +136,8 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 					return d.JDevices[deviceName].Camera.PutConfig([]byte(v))
 				}
 			default:
-				if d.JDevices[deviceName].Onvif == nil {
-					return errors.New("Current device does not support onvif")
+				if d.JDevices[deviceName].Control != nil {
+					return errors.New("Current device does not support control protocols")
 				}
 				moveHandled := false
 
@@ -149,11 +149,11 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 						err = d.HandleMoveCommand(deviceName, params)
 					}
 				case "stop":
-					err = d.JDevices[deviceName].Onvif.Stop()
+					err = d.JDevices[deviceName].Control.Stop()
 				case "set_home_position":
-					err = d.JDevices[deviceName].Onvif.SetHomePosition()
+					err = d.JDevices[deviceName].Control.SetHomePosition()
 				case "reset_position":
-					err = d.JDevices[deviceName].Onvif.Reset()
+					err = d.JDevices[deviceName].Control.Reset()
 				case "set_preset":
 					{
 						v, err := param.StringValue()
@@ -161,7 +161,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 						if err != nil {
 							return err
 						}
-						err = d.JDevices[deviceName].Onvif.SetPreset(vint)
+						err = d.JDevices[deviceName].Control.SetPreset(vint)
 					}
 				case "goto_preset":
 					{
@@ -170,7 +170,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 						if err != nil {
 							return err
 						}
-						err = d.JDevices[deviceName].Onvif.GotoPreset(vint)
+						err = d.JDevices[deviceName].Control.GotoPreset(vint)
 					}
 				}
 				if err != nil {

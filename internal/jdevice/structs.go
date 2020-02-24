@@ -1,11 +1,11 @@
 package jdevice
 
 type JDevice struct {
-	Name   string
-	Type   string
-	Id     string
-	Camera Camera
-	Onvif  Onvif
+	Name    string
+	Type    string
+	Id      string
+	Camera  Camera
+	Control Control
 }
 
 type JDeviceConfig struct {
@@ -13,5 +13,5 @@ type JDeviceConfig struct {
 	Type    string `json:"type"`
 	Name    string `json:"name"`
 	Id      string `json:"id"`
-	Onvif   bool   `json:"onvif"`
+	Control string `json:"control"` // onvif/sip/none
 }
