@@ -1,0 +1,10 @@
+[submodule "internal/mod/device-sdk-go"]
+	path = internal/mod/device-sdk-go
+	url = http://gitlab.jiangxingai.com/applications/edgex/device-sdk-go.git
+	branch = jx_edinburgh
+[submodule "internal/mod/go-mod-core-contracts"]
+	path = internal/mod/go-mod-core-contracts
+	url = http://gitlab.jiangxingai.com/applications/edgex/go-mod-core-contracts.git
+[submodule "internal/mod/go-mod-registry"]
+	path = internal/mod/go-mod-registry
+	url = http://gitlab.jiangxingai.com/applications/edgex/go-mod-registry.git
