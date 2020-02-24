@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  edgex-device-cameras:
+    image: registry.jiangxingai.com:5000/edgex/device-service/cameras-gst-rkmpp:arm64v8-cpu-0.0.1
+    container_name: edgex-device-cameras
+    hostname: edgex-device-cameras
+    restart: always
+    volumes:
+      - /tmp:/tmp
+      - /data/tmpfs:/data/tmpfs
+      - /sys:/sys
+    command: --pm gst-launch-1.0
+    privileged: true
+
+networks:
+  default:
+    external:
+      name: edgex
