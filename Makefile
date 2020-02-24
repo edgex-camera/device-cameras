@@ -45,7 +45,7 @@ device-service: | $(BUILDDIR)
 	cp -r cmd/device-service/res $(BUILDDIR)/bin/
 
 changelog: check_version | $(BUILDDIR)
-	echo "# Changelog\n" > %(CHANGELOG)
+	echo "# Changelog\n" > $(CHANGELOG)
 	git tag --sort=-taggerdate --format='## %(tag) - %(taggerdate:short)%0a### Author: %(taggername) %(taggeremail)%0a%(contents)%0a' >> $(CHANGELOG)
 
 $(BUILDDIR):
