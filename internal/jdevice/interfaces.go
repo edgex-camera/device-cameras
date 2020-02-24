@@ -30,7 +30,7 @@ type Camera interface {
 	ListChannels() []string               // 列出当前摄像头所有channel列表
 }
 
-type Onvif interface {
+type Control interface {
 	MergeConfig(configPatch []byte) error // 整合新配置
 	PutConfig([]byte) error               // 上传新配置
 

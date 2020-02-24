@@ -78,7 +78,7 @@ func (d *Driver) addOrModDeviceByConfig(deviceName string, conf map[string]strin
 	jDevice := jdevice.JDevice{Id: basicConf.Id, Name: basicConf.Name, Type: basicConf.Type}
 
 	// 创建onvif实例
-	if basicConf.Onvif {
+	if basicConf.Control == "onvif" {
 		onvifStr, ok := conf[deviceName+".onvif.config"]
 		if !ok {
 			d.lc.Info(fmt.Sprintf("Device with name %v onvif config not exists.", deviceName))
@@ -91,8 +91,12 @@ func (d *Driver) addOrModDeviceByConfig(deviceName string, conf map[string]strin
 			d.lc.Info(fmt.Sprint("Create onvif device failed: ", err))
 			return
 		}
-		jDevice.Onvif = deviceOnvif
+		jDevice.Control = deviceOnvif
 	}
+
+	// 创建sip实例
+	// TODO
+	// if basicConf.Control == "sip" {}
 
 	// 创建camera实例
 	cameraStr, ok := conf[deviceName+".camera"]
