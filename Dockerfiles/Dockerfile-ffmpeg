@@ -1,0 +1,38 @@
+#
+# Copyright (c) 2018, 2019 Intel
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# FROM golang:1.11-alpine AS builder
+# ARG BUILD_PATH
+
+# RUN sed -e 's/dl-cdn[.]alpinelinux.org/nl.alpinelinux.org/g' -i~ /etc/apk/repositories
+
+# # add git for go modules
+# RUN apk update && apk add make git
+
+# WORKDIR $BUILD_PATH
+
+# COPY . .
+
+# RUN go get -d -v ./...
+
+# RUN make build-arm64
+
+
+# Next image - Copy built Go binary into new workspace
+FROM registry.jiangxingai.com:5000/base/device-pipe:arm64v8-cpu-0.1.1
+ARG GOARCH
+
+ENV APP_PORT=80
+#expose command data port
+EXPOSE $APP_PORT
+
+WORKDIR /app
+COPY bin/device-service-$GOARCH /app/device-service
+COPY bin/res /app/res
+COPY bin/res/docker/configuration.toml /app/res/configuration.toml
+COPY CHANGELOG.md /app
+
+ENTRYPOINT [ "/app/device-service"]
