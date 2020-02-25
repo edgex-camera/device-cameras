@@ -53,7 +53,7 @@ func (nc *NormalCamera) GetConfigure() []byte {
 }
 
 func (nc *NormalCamera) PutConfig(config []byte) error {
-	configName := nc.Name + "/camera/" + nc.ChannelId
+	configName := nc.Name + ".camera." + nc.ChannelId
 	return jxstartup.PutDriverConfig(configName, config)
 }
 
