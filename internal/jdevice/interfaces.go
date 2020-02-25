@@ -20,9 +20,9 @@ type Camera interface {
 	GetStreamAddr() string              // 取推流地址
 
 	// Json config
-	MergeConfig(configPatch []byte) error // 整合新配置并重启摄像头
-	GetConfigure() []byte                 // 获取当前摄像头配置
-	//PutConfig([]byte) error               // 上传新配置 TODO
+	MergeConfig() error     // 整合新配置并重启摄像头
+	GetConfigure() []byte   // 获取当前摄像头配置
+	PutConfig([]byte) error // 上传新配置
 
 	// For channel manage
 	AddChannel() error                    // 当前摄像头增加channel
@@ -30,9 +30,9 @@ type Camera interface {
 	ListChannels() []string               // 列出当前摄像头所有channel列表
 }
 
-type Onvif interface {
-	MergeConfig(configPatch []byte) error // 整合新配置
-	//PutConfig([]byte) error               // 上传新配置 TODO
+type Control interface {
+	MergeConfig() error     // 整合新配置
+	PutConfig([]byte) error // 上传新配置
 
 	ContinuousMove(time time.Duration, move onvif.Move) error // 移动摄像头
 	Stop() error                                              // 停止摄像头

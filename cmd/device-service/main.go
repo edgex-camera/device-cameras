@@ -9,6 +9,8 @@
 package main
 
 import (
+	"flag"
+
 	"github.com/edgexfoundry/device-sdk-go"
 	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/driver"
@@ -21,7 +23,11 @@ const (
 )
 
 func main() {
-	driver.CurrentDriver = driver.Driver{}
+	var processMethod string
+	flag.StringVar(&processMethod, "pm", "ffmpeg", "which process should be used to process video, eg. ffmpeg, gst-launch-1.0")
+	flag.Parse()
+
+	driver.CurrentDriver = driver.Driver{ProcessMethod: processMethod}
 	err := jxstartup.StartServiceWithHandler(serviceName, device.Version, &driver.CurrentDriver, restful.InitRestRoutes, staticPath)
 	if err != nil {
 		panic(err)

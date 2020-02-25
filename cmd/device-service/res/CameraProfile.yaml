@@ -1,0 +1,423 @@
+name: "camera"
+manufacturer: "JiangXing"
+model: ""
+labels:
+    - "camera"
+description: "摄像头"
+
+deviceResources:
+    -
+        name: "capture_path"
+        description: "截图文件地址"
+        properties:
+            value:
+                { type: "String", readWrite: "R", defaultValue: "{\"capture_path\": \"\"}" }
+            units:
+                { type: "String", readWrite: "RW", defaultValue: "json" }
+    -
+        name: "image_paths"
+        description: "定时截图文件地址列表"
+        properties:
+            value:
+                { type: "String", readWrite: "R", defaultValue: "{\"image_paths\": []}" }
+            units:
+    -
+        name: "video_paths"
+        description: "视频文件地址列表"
+        properties:
+            value:
+                { type: "String", readWrite: "R", defaultValue: "{\"video_paths\": []}" }
+            units:
+                { type: "String", readWrite: "RW", defaultValue: "json" }
+    -
+        name: "stream_addr"
+        description: "推流地址"
+        properties:
+            value:
+                { type: "String", readWrite: "R", defaultValue: "{\"stream_addr\": \"\"}" }
+            units:
+                { type: "String", readWrite: "RW", defaultValue: "json" }
+    -
+        name: "channels"
+        description: "摄像头通道id列表"
+        properties:
+            value:
+              { type: "String", readWrite: "RW", defaultValue: "{\"channles\": []}" }
+            units:
+    -
+        name: "config"
+        description: "摄像头配置"
+        properties:
+            value:
+                { type: "String", readWrite: "RW", defaultValue: "{}" }
+            units:
+                { type: "String", readWrite: "RW", defaultValue: "CameraConfig" }
+
+    -
+        name: "presets"
+        description: "预设点配置"
+        properties:
+            value:
+                { type: "String", readWrite: "RW", defaultValue: "{}" }
+            units:
+                { type: "String", readWrite: "RW", defaultValue: "presets" }
+
+    -
+        name: "pan"
+        description: "平行移动"
+        properties:
+            value:
+                { type: "Float32", readWrite: "W", defaultValue: "0", minimum: "-1.00", maximum: "1.00" }
+            units:
+                { type: "String", readWrite: "RW", defaultValue: "" }
+    
+    -
+        name: "tilt"
+        description: "垂直移动"
+        properties:
+            value:
+                { type: "Float32", readWrite: "W", defaultValue: "0", minimum: "-1.00", maximum: "1.00" }
+            units:
+                { type: "String", readWrite: "RW", defaultValue: "" }
+
+    -
+        name: "zoom"
+        description: "缩放"
+        properties:
+            value:
+                { type: "Float32", readWrite: "W", defaultValue: "0", minimum: "-1.00", maximum: "1.00" }
+            units:
+                { type: "String", readWrite: "RW", defaultValue: "" }
+
+    -
+        name: "timeout"
+        description: "持续时间"
+        properties:
+            value:
+                { type: "Float32", readWrite: "W", defaultValue: "1.00", minimum: "0.00" }
+            units:
+                { type: "String", readWrite: "RW", defaultValue: "Second" }
+
+    -
+        name: "stop"
+        description: "停止移动"
+        properties:
+            value:
+                { type: "String", readWrite: "W", defaultValue: "stop" }
+
+    -
+        name: "reset_position"
+        description: "重置位置"
+        properties:
+            value:
+                { type: "String", readWrite: "W", defaultValue: "reset" }
+
+    -
+        name: "set_home_position"
+        description: "重置位置"
+        properties:
+            value:
+                { type: "String", readWrite: "W", defaultValue: "set_home" }
+
+    -
+        name: "set_preset"
+        description: "设置预置点"
+        properties:
+            value:
+                { type: "String", readWrite: "W", defaultValue: "set_preset" }
+
+    -
+        name: "goto_preset"
+        description: "回到预置点"
+        properties:
+            value:
+                { type: "String", readWrite: "W", defaultValue: "goto_preset" }
+
+deviceCommands:
+    -
+        name: "capture_path"
+        get:
+            - { operation: "get", object: "capture_path" }
+
+    -
+        name: "video_paths"
+        get:
+            - { operation: "get", object: "video_paths" }
+
+    -
+        name: "image_paths"
+        get:
+            - { operation: "get", object: "image_paths" }
+
+    -
+        name: "stream_addr"
+        get:
+            - { operation: "get", object: "stream_addr" }
+
+    -
+        name: "channels"
+        get:
+            - { operation: "get", object: "channels" }
+
+    -
+        name: "config"
+        get:
+          - { operation: "get", object: "config", parameter: "config" }
+        set:
+          - { operation: "set", object: "config", parameter: "config" }
+
+    -
+        name: "presets"
+        get:
+          - { operation: "get", object: "presets", parameter: "presets" }
+        set:
+          - { operation: "set", object: "presets", parameter: "presets" }
+
+    -
+        name: "continuous_move"
+        set:
+          - { operation: "set", object: "pan", parameter: "pan" }
+          - { operation: "set", object: "tilt", parameter: "tilt" }
+          - { operation: "set", object: "zoom", parameter: "zoom" }
+          - { operation: "set", object: "timeout", parameter: "timeout" }
+
+    -
+        name: "stop"
+        set:
+          - { operation: "set", object: "stop", parameter: "stop" }
+
+    -
+        name: "set_home_position"
+        set:
+          - { operation: "set", object: "set_home_position", parameter: "set_home_position" }
+  
+    -
+        name: "reset_position"
+        set:
+          - { operation: "set", object: "reset_position", parameter: "reset_position" }
+
+    -
+        name: "set_preset"
+        set:
+          - { operation: "set", object: "set_preset", parameter: "set_preset" }
+
+    -
+        name: "goto_preset"
+        set:
+          - { operation: "set", object: "goto_preset", parameter: "goto_preset" }
+
+
+coreCommands:
+    -
+        name: "capture_path"
+        get:
+            path: "/api/v1/device/{deviceId}/capture_path"
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: ["capture_path"]
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+
+    -
+        name: "stream_addr"
+        get:
+            path: "/api/v1/device/{deviceId}/stream_addr"
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: ["stream_addr"]
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+    
+    -
+        name: "image_paths"
+        get:
+            path: "/api/v1/device/{deviceId}/image_paths"
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: ["image_paths"]
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+
+    -
+        name: "video_paths"
+        get:
+            path: "/api/v1/device/{deviceId}/video_paths"
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: ["video_paths"]
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+
+    -
+        name: "channels"
+        get:
+            path: "/api/v1/device/{deviceId}/channels"
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: ["channels"]
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+
+    -
+        name: "config"
+        get:
+            path: "/api/v1/device/{deviceId}/config"
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: ["config"]
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+
+        put:
+            path: "/api/v1/device/{deviceId}/config"
+            parameterNames: ["config"]
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: []
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+
+    -
+        name: "presets"
+        get:
+            path: "/api/v1/device/{deviceId}/presets"
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: ["presets"]
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+
+        put:
+            path: "/api/v1/device/{deviceId}/presets"
+            parameterNames: ["presets"]
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: []
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+
+    -
+        name: "continuous_move"
+        put: 
+            path: "/api/v1/device/{deviceId}/continuous_move"
+            parameterNames: ["pan","tilt","zoom","timeout"]
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: []
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+
+    -
+        name: "stop_move"
+        put: 
+            path: "/api/v1/device/{deviceId}/stop"
+            parameterNames: ["stop"]
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: []
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+
+    -
+        name: "reset_position"
+        put: 
+            path: "/api/v1/device/{deviceId}/reset_position"
+            parameterNames: ["reset_position"]
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: []
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+    
+    -
+        name: "set_home_position"
+        put: 
+            path: "/api/v1/device/{deviceId}/set_home_position"
+            parameterNames: ["set_home_position"]
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: []
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+
+    -
+        name: "set_preset"
+        put: 
+            path: "/api/v1/device/{deviceId}/set_preset"
+            parameterNames: ["set_preset"]
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: []
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+
+    -
+        name: "goto_preset"
+        put: 
+            path: "/api/v1/device/{deviceId}/goto_preset"
+            parameterNames: ["goto_preset"]
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: []
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []

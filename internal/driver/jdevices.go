@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/edgexfoundry/device-sdk-go"
 	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice"
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice/normalcam"
@@ -12,6 +13,8 @@ import (
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/onvif"
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/utils"
 )
+
+const ALL_DEVICES_KEY = "all_devices"
 
 // 设备类型
 const NORMAL_CAMERA = "normal-camera"     // 普通usb/ip摄像头
@@ -32,7 +35,7 @@ func (d *Driver) AddJdevice(deviceName, deviceType string) error {
 		return err
 	}
 
-	jDevice := jdevice.JDevice{Id: id}
+	jDevice := jdevice.JDevice{Id: id, Type: deviceType, Name: deviceName}
 
 	// 普通摄像头、onvif摄像头的摄像头部分
 	if deviceType == NORMAL_CAMERA || deviceType == ONVIF_CAMERA {
@@ -54,11 +57,11 @@ func (d *Driver) AddJdevice(deviceName, deviceType string) error {
 	// onvif摄像头onvif部分
 	if deviceType == ONVIF_CAMERA {
 		config := onvif.OnvifConfig{}
-		deviceOnvif, err := jdevice.NewOnvif(deviceName, d.lc, config)
+		deviceControl, err := jdevice.NewOnvif(deviceName, d.lc, config)
 		if err != nil {
 			return err
 		}
-		jDevice.Onvif = deviceOnvif
+		jDevice.Control = deviceControl
 	}
 	if deviceType == DUAL_USB_CAMERA {
 
@@ -68,7 +71,7 @@ func (d *Driver) AddJdevice(deviceName, deviceType string) error {
 	}
 
 	d.JDevices[deviceName] = jDevice
-	return setupJdeviceConfig(jDevice)
+	return setupJdeviceConfig(jDevice, true, deviceType)
 }
 
 // Remove Jdevice
@@ -76,24 +79,51 @@ func (d *Driver) RemoveJdevice(deviceName string) error {
 	if _, ok := d.JDevices[deviceName]; !ok {
 		d.lc.Info(fmt.Sprintf("Device to remove is not running "), deviceName)
 	} else {
-		d.JDevices[deviceName].Camera.Disable(true)
-		// TODO
+		if d.JDevices[deviceName].Camera != nil {
+			d.JDevices[deviceName].Camera.Disable(true)
+		}
+		delete(d.JDevices, deviceName)
 	}
-	return nil
-}
-
-// JDevice基础信息
-func setupJdeviceConfig(jDevice jdevice.JDevice) error {
-	config := jdevice.JDeviceConfig{}
-	config.Name = jDevice.Name
-	config.Id = jDevice.Id
-	if jDevice.Onvif != nil {
-		config.Onvif = true
-	}
-	configBytes, err := json.Marshal(config)
+	jDevice := jdevice.JDevice{Name: deviceName}
+	err := setupJdeviceConfig(jDevice, false, "")
 	if err != nil {
 		return err
 	}
-	configName := config.Name + "/" + "basic"
+	return jxstartup.Service.RemoveDeviceByName(deviceName)
+}
+
+// JDevice基础信息
+func setupJdeviceConfig(jDevice jdevice.JDevice, enabled bool, deviceType string) error {
+	// 修改all_devices配置信息
+	allDevices := []byte{}
+	allDevicesMap := make(map[string]bool)
+	if all, ok := device.DriverConfigs()[ALL_DEVICES_KEY]; ok {
+		allDevices = []byte(all)
+		json.Unmarshal(allDevices, &allDevicesMap)
+	}
+
+	allDevicesMap[jDevice.Name] = enabled
+	if !enabled {
+		delete(allDevicesMap, jDevice.Name)
+	}
+	allDevices, _ = json.Marshal(allDevicesMap)
+	err := jxstartup.PutDriverConfig(ALL_DEVICES_KEY, allDevices)
+	if err != nil {
+		return err
+	}
+
+	// 修改device自身配置
+	config := jdevice.JDeviceConfig{}
+	config.Enabled = enabled
+	config.Name = jDevice.Name
+	config.Id = jDevice.Id
+	config.Type = deviceType
+	if deviceType == ONVIF_CAMERA {
+		config.Control = "onvif"
+	} else {
+		config.Control = "none"
+	}
+	configName := config.Name
+	configBytes, _ := json.Marshal(config)
 	return jxstartup.PutDriverConfig(configName, configBytes)
 }

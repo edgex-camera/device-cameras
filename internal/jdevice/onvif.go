@@ -9,20 +9,21 @@ import (
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/onvif"
 )
 
-func NewOnvif(name string, lc logger.LoggingClient, config onvif.OnvifConfig) (Onvif, error) {
+func NewOnvif(name string, lc logger.LoggingClient, config onvif.OnvifConfig) (Control, error) {
 	oc := &onvif.OnvifCamera{
+		Name:        name,
 		Lc:          lc,
 		OnvifConfig: config,
 	}
-	err := SetupOnvifConfig(oc, name)
+	err := SetupOnvifConfig(oc.OnvifConfig, name)
 	if err != nil {
 		return oc, err
 	}
 	return oc, nil
 }
 
-func SetupOnvifConfig(onvif Onvif, name string) error {
-	configName := name + "/onvif"
+func SetupOnvifConfig(onvif onvif.OnvifConfig, name string) error {
+	configName := name + ".onvif.config"
 	if _, ok := device.DriverConfigs()[configName]; !ok {
 		config, _ := json.Marshal(onvif)
 		return jxstartup.PutDriverConfig(configName, config)

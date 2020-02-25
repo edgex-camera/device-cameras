@@ -78,7 +78,11 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]cont
 				res = append(res, cv)
 			}
 		case "presets":
-
+			{
+				presets := d.JDevices[deviceName].Control.GetPresets()
+				cv := dsModels.NewStringValue(reqs[0].DeviceResourceName, now, presets)
+				res = append(res, cv)
+			}
 		}
 	}
 	return nil, err
@@ -94,21 +98,23 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 			switch param.DeviceResourceName {
 			case "add_device", "device_type":
 				var name, deviceType string
-				switch param.DeviceResourceName {
-				case "add_device":
-					v, err := param.StringValue()
-					if err != nil {
-						return err
+				for _, param := range params {
+					switch param.DeviceResourceName {
+					case "add_device":
+						v, err := param.StringValue()
+						if err != nil {
+							return err
+						}
+						name = v
+					case "device_type":
+						v, err := param.StringValue()
+						if err != nil {
+							return err
+						}
+						deviceType = v
 					}
-					name = v
-				case "device_type":
-					v, err := param.StringValue()
-					if err != nil {
-						return err
-					}
-					deviceType = v
-					return d.AddJdevice(name, deviceType)
 				}
+				return d.AddJdevice(name, deviceType)
 			case "remove_device":
 				v, err := param.StringValue()
 				if err != nil {
@@ -122,10 +128,16 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 		for _, param := range params {
 			switch param.DeviceResourceName {
 			case "config":
-				return d.HandleWriteConfigCommand(deviceName, param)
+				{
+					v, err := param.StringValue()
+					if err != nil {
+						return err
+					}
+					return d.JDevices[deviceName].Camera.PutConfig([]byte(v))
+				}
 			default:
-				if d.JDevices[deviceName].Onvif == nil {
-					return errors.New("Current device does not support onvif")
+				if d.JDevices[deviceName].Control != nil {
+					return errors.New("Current device does not support control protocols")
 				}
 				moveHandled := false
 
@@ -137,11 +149,11 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 						err = d.HandleMoveCommand(deviceName, params)
 					}
 				case "stop":
-					err = d.JDevices[deviceName].Onvif.Stop()
+					err = d.JDevices[deviceName].Control.Stop()
 				case "set_home_position":
-					err = d.JDevices[deviceName].Onvif.SetHomePosition()
+					err = d.JDevices[deviceName].Control.SetHomePosition()
 				case "reset_position":
-					err = d.JDevices[deviceName].Onvif.Reset()
+					err = d.JDevices[deviceName].Control.Reset()
 				case "set_preset":
 					{
 						v, err := param.StringValue()
@@ -149,7 +161,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 						if err != nil {
 							return err
 						}
-						err = d.JDevices[deviceName].Onvif.SetPreset(vint)
+						err = d.JDevices[deviceName].Control.SetPreset(vint)
 					}
 				case "goto_preset":
 					{
@@ -158,7 +170,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 						if err != nil {
 							return err
 						}
-						err = d.JDevices[deviceName].Onvif.GotoPreset(vint)
+						err = d.JDevices[deviceName].Control.GotoPreset(vint)
 					}
 				}
 				if err != nil {

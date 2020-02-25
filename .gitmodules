@@ -8,4 +8,3 @@
 [submodule "internal/mod/go-mod-registry"]
 	path = internal/mod/go-mod-registry
 	url = http://gitlab.jiangxingai.com/applications/edgex/go-mod-registry.git
-
