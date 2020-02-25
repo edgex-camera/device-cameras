@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 
+	"github.com/edgexfoundry/device-sdk-go"
 	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
 	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/utils"
 )
@@ -42,8 +43,9 @@ func (nc *NormalCamera) GetStreamAddr() string {
 }
 
 // configs
-func (nc *NormalCamera) MergeConfig(configPatch []byte) error {
-	return nc.Camera.MergeConfig(configPatch)
+func (nc *NormalCamera) MergeConfig() error {
+	configPatch, _ := device.DriverConfigs()[nc.Name+".camera."+nc.ChannelId]
+	return nc.Camera.MergeConfig([]byte(configPatch))
 }
 
 func (nc *NormalCamera) GetConfigure() []byte {

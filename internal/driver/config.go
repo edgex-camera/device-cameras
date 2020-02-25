@@ -27,10 +27,10 @@ func (d *Driver) OnConfigChange(oldConf map[string]string, newConf map[string]st
 		_, ok := d.JDevices[deviceName]
 		if !ok {
 			// 目前未运行该设备，根据配置加入
-			d.addOrModDeviceByConfig(deviceName, newConf)
+			d.addDeviceByConfig(deviceName, newConf)
 		} else if d.cameraConfigChanged(deviceName, oldConf, newConf) {
 			// 目前配置与旧配置不同，根据配置修改
-			d.addOrModDeviceByConfig(deviceName, newConf)
+			d.modifyDeviceByConfig(deviceName, newConf)
 		}
 	}
 
@@ -58,7 +58,7 @@ func (d *Driver) cameraConfigChanged(deviceName string, oldConf, newConf map[str
 	return false
 }
 
-func (d *Driver) addOrModDeviceByConfig(deviceName string, conf map[string]string) {
+func (d *Driver) addDeviceByConfig(deviceName string, conf map[string]string) {
 	d.lc.Info(fmt.Sprint("Adding device: ", deviceName))
 
 	basicStr, ok := conf[deviceName]
@@ -126,8 +126,19 @@ func (d *Driver) addOrModDeviceByConfig(deviceName string, conf map[string]strin
 		}
 		jDevice.Camera = deviceCamera
 		// 运行camera
-		deviceCamera.MergeConfig([]byte(conf[deviceName+".camera."+channelId]))
+		//deviceCamera.MergeConfig([]byte(conf[deviceName+".camera."+channelId]))
+		deviceCamera.MergeConfig()
 		// 将jDevice加入到driver
 		d.JDevices[deviceName] = jDevice
 	}
+}
+
+func (d *Driver) modifyDeviceByConfig(deviceName string, conf map[string]string) {
+	d.lc.Info(fmt.Sprint("Modifying device: ", deviceName))
+
+	// 更新摄像头配置
+	d.JDevices[deviceName].Camera.MergeConfig()
+
+	// 更新控制协议配置
+	d.JDevices[deviceName].Control.MergeConfig()
 }
