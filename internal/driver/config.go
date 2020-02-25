@@ -40,6 +40,7 @@ func (d *Driver) OnConfigChange(oldConf map[string]string, newConf map[string]st
 			d.RemoveJdevice(name)
 		}
 	}
+	d.lc.Info(fmt.Sprint("Current devices: ", d.JDevices))
 }
 
 func (d *Driver) cameraConfigChanged(deviceName string, oldConf, newConf map[string]string) bool {
@@ -137,8 +138,12 @@ func (d *Driver) modifyDeviceByConfig(deviceName string, conf map[string]string)
 	d.lc.Info(fmt.Sprint("Modifying device: ", deviceName))
 
 	// 更新摄像头配置
-	d.JDevices[deviceName].Camera.MergeConfig()
+	if d.JDevices[deviceName].Camera != nil {
+		d.JDevices[deviceName].Camera.MergeConfig()
+	}
 
 	// 更新控制协议配置
-	d.JDevices[deviceName].Control.MergeConfig()
+	if d.JDevices[deviceName].Control != nil {
+		d.JDevices[deviceName].Control.MergeConfig()
+	}
 }
