@@ -26,5 +26,5 @@ func (d *Driver) HandleMoveCommand(deviceName string, params []*dsModels.Command
 			timeout = time.Duration(int64(float32(time.Second) * v))
 		}
 	}
-	return d.JDevices[deviceName].Onvif.ContinuousMove(timeout, move)
+	return d.JDevices[deviceName].Control.ContinuousMove(timeout, move)
 }

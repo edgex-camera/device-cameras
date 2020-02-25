@@ -19,6 +19,7 @@ type Move struct {
 }
 
 type OnvifCamera struct {
+	Name         string
 	device       OnvifDevice
 	Lc           logger.LoggingClient
 	OnvifConfig  OnvifConfig

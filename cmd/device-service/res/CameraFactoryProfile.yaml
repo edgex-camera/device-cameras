@@ -1,0 +1,73 @@
+name: "camera-factory"
+manufacturer: "JiangXing"
+model: ""
+labels:
+    - "camera-factory"
+description: "摄像头设备生成器"
+
+deviceResources:
+    -
+        name: "add_device"
+        description: "添加设备名称"
+        properties:
+            value:
+                { type: "String", readWrite: "RW", defaultValue: "" }
+            units:
+                { type: "String", readWrite: "RW", defaultValue: "" }
+    -
+        name: "remove_device"
+        description: "删除设备名称"
+        properties:
+            value:
+                { type: "String", readWrite: "RW", defaultValue: "" }
+            units:
+                { type: "String", readWrite: "RW", defaultValue: "" }
+    -
+        name: "device_type"
+        description: "设备类型(normal-camera, onvif-camera, dual-usb-camera等)"
+        properties:
+            value:
+                { type: "String", readWrite: "RW", defaultValue: "" }
+            units:
+                { type: "String", readWrite: "RW", defaultValue: "" }
+
+deviceCommands:
+    -
+        name: "add_device"
+        set:
+          - { operation: "set", object: "add_device", parameter: "add_device" }
+          - { operation: "set", object: "device_type", parameter: "device_type" }
+    -
+        name: "remove_device"
+        set:
+          - { operation: "set", object: "remove_device", parameter: "remove_device" }
+
+coreCommands:
+    -
+        name: "add_device"
+        put:
+            path: "/api/v1/device/{deviceId}/add_device"
+            parameterNames: ["add_device", "device_type"]
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: []
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
+    -
+        name: "remove_device"
+        put:
+            path: "/api/v1/device/{deviceId}/remove_device"
+            parameterNames: ["remove_device"]
+            responses:
+            -
+                code: "200"
+                description: "valid and accepted"
+                expectedValues: []
+            -
+                code: "503"
+                description: "service unavailable"
+                expectedValues: []
