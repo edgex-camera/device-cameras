@@ -14,7 +14,7 @@ import (
 )
 
 func appendOnvifRoute(r *mux.Router, h *handler) {
-	prefix := "/onvif"
+	prefix := "/control"
 	subRouter := r.PathPrefix(prefix).Subrouter()
 	subRouter.Use(h.checkDeviceMiddvare, h.checkOnvifMiddvare)
 
@@ -35,7 +35,7 @@ func (h *handler) getPresetPosition(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := responce{
-		PresetPosition: driver.CurrentDriver.JDevices[getCameraName(r)].Onvif.GetPresets(),
+		PresetPosition: driver.CurrentDriver.JDevices[getCameraName(r)].Control.GetPresets(),
 	}
 	h.respSuccess(resp, w)
 }
@@ -75,9 +75,9 @@ func (h *handler) postOnvifMove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.onvifDo(
-		driver.CurrentDriver.JDevices[getCameraName(r)].Onvif,
+		driver.CurrentDriver.JDevices[getCameraName(r)].Control,
 		w,
-		func(jOnvif jdevice.Onvif) error {
+		func(jOnvif jdevice.Control) error {
 			return jOnvif.ContinuousMove(time.Duration(req.TimeOut)*time.Second, move)
 		})
 }
@@ -85,9 +85,9 @@ func (h *handler) postOnvifMove(w http.ResponseWriter, r *http.Request) {
 //停止
 func (h *handler) postOnvifStop(w http.ResponseWriter, r *http.Request) {
 	h.onvifDo(
-		driver.CurrentDriver.JDevices[getCameraName(r)].Onvif,
+		driver.CurrentDriver.JDevices[getCameraName(r)].Control,
 		w,
-		func(jOnvif jdevice.Onvif) error {
+		func(jOnvif jdevice.Control) error {
 			return jOnvif.Stop()
 		})
 }
@@ -95,9 +95,9 @@ func (h *handler) postOnvifStop(w http.ResponseWriter, r *http.Request) {
 //设置零点
 func (h *handler) postSetHomePosition(w http.ResponseWriter, r *http.Request) {
 	h.onvifDo(
-		driver.CurrentDriver.JDevices[getCameraName(r)].Onvif,
+		driver.CurrentDriver.JDevices[getCameraName(r)].Control,
 		w,
-		func(jOnvif jdevice.Onvif) error {
+		func(jOnvif jdevice.Control) error {
 			return jOnvif.SetHomePosition()
 		})
 }
@@ -105,9 +105,9 @@ func (h *handler) postSetHomePosition(w http.ResponseWriter, r *http.Request) {
 //回到零点
 func (h *handler) postResetPosition(w http.ResponseWriter, r *http.Request) {
 	h.onvifDo(
-		driver.CurrentDriver.JDevices[getCameraName(r)].Onvif,
+		driver.CurrentDriver.JDevices[getCameraName(r)].Control,
 		w,
-		func(jOnvif jdevice.Onvif) error {
+		func(jOnvif jdevice.Control) error {
 			return jOnvif.Reset()
 		})
 
@@ -121,9 +121,9 @@ func (h *handler) postSetPresetPosition(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	h.onvifDo(
-		driver.CurrentDriver.JDevices[getCameraName(r)].Onvif,
+		driver.CurrentDriver.JDevices[getCameraName(r)].Control,
 		w,
-		func(jOnvif jdevice.Onvif) error {
+		func(jOnvif jdevice.Control) error {
 			return jOnvif.SetPreset(presetNumber)
 		})
 }
@@ -136,14 +136,14 @@ func (h *handler) postGotoPresetPosition(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	h.onvifDo(
-		driver.CurrentDriver.JDevices[getCameraName(r)].Onvif,
+		driver.CurrentDriver.JDevices[getCameraName(r)].Control,
 		w,
-		func(jOnvif jdevice.Onvif) error {
+		func(jOnvif jdevice.Control) error {
 			return jOnvif.GotoPreset(presetNumber)
 		})
 }
 
-func (h *handler) onvifDo(onvif jdevice.Onvif, w http.ResponseWriter, toDo func(jOnvif jdevice.Onvif) error) {
+func (h *handler) onvifDo(onvif jdevice.Control, w http.ResponseWriter, toDo func(jOnvif jdevice.Control) error) {
 
 	err := toDo(onvif)
 	if err != nil {
