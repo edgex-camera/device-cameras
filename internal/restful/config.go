@@ -11,7 +11,6 @@ import (
 func appendConfigRoute(r *mux.Router, h *handler) {
 	prefix := "/config"
 	subRouter := r.PathPrefix(prefix).Subrouter()
-
 	subRouter.Path("/{camera_name}").HandlerFunc(h.getCameraConfig).Methods(http.MethodGet)
 	subRouter.Path("/{camera_name}").HandlerFunc(h.postModifyCameraConfig).Methods(http.MethodPost)
 
@@ -31,10 +30,10 @@ func (h *handler) postModifyCameraConfig(w http.ResponseWriter, r *http.Request)
 		h.respFailed(err, w)
 	}
 	JDevice := driver.CurrentDriver.JDevices[getCameraName(r)]
-	err = JDevice.Camera.MergeConfig(data)
+	err = JDevice.Camera.PutConfig(data)
 	if err != nil {
 		h.respFailed(err, w)
 	}
-	mergedConfigure := JDevice.Camera.GetCapturePath()
-	h.respSuccess(mergedConfigure, w)
+	newConfigure := JDevice.Camera.GetCapturePath()
+	h.respSuccess(newConfigure, w)
 }

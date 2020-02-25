@@ -40,7 +40,7 @@ func (h *handler) respSuccess(body interface{}, w http.ResponseWriter) {
 }
 
 func (h *handler) respFailed(err error, w http.ResponseWriter) {
-	resp := baseResponse{Data: err, Message: "failed"}
+	resp := baseResponse{Data: nil, Message: fmt.Sprintln(err)}
 	h.respWithStatusCode(resp, w, 500)
 }
 
@@ -75,7 +75,7 @@ func (h *handler) checkOnvifMiddvare(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		deviceName := getCameraName(r)
 
-		if driver.CurrentDriver.JDevices[deviceName].Onvif == nil {
+		if driver.CurrentDriver.JDevices[deviceName].Control == nil {
 			h.respFailed(fmt.Errorf("this %s devicee not support onvif", deviceName), w)
 			return
 		}

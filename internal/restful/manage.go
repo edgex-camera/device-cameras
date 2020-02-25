@@ -17,6 +17,7 @@ func appendDeviceManageRoute(r *mux.Router, h *handler) {
 	subRouter.Path("/{camera_name}").HandlerFunc(h.getCameraInfo).Methods(http.MethodGet)
 	subRouter.Path("/{camera_name}").HandlerFunc(h.deleteRemoveCamera).Methods(http.MethodDelete)
 	subRouter.Path("/{camera_name}/{deivce_type}").HandlerFunc(h.postAddCamera).Methods(http.MethodPost)
+
 }
 
 //获取所有的的camera设备
