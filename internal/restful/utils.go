@@ -94,3 +94,30 @@ func (h *handler) checkCameraMiddvare(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+func (h *handler) getPageInfo(r *http.Request) (int, int) {
+	offset := 0
+	v, _ := r.URL.Query()["offset"]
+	if len(v) == 1 {
+		offset, _ = strconv.Atoi(v[0])
+	}
+	limit := 0
+	v, _ = r.URL.Query()["limit"]
+	if len(v) == 1 {
+		limit, _ = strconv.Atoi(v[0])
+	}
+	return offset, limit
+}
+
+func (h *handler) currentPage(offset, limit int, data []string) ([]string, error) {
+	length := len(data)
+	if offset > length {
+		return []string{}, fmt.Errorf("offset more than total")
+	}
+	if offset+limit > length {
+		return data[offset : offset+limit], nil
+
+	} else {
+		return data[offset:], nil
+	}
+}

@@ -38,13 +38,21 @@ func (h *handler) getVideoPaths(w http.ResponseWriter, r *http.Request) {
 func (h *handler) getImageURls(w http.ResponseWriter, r *http.Request) {
 	type responce struct {
 		ImageURLs []string `json:"imageurls"`
+		Total     int      `json:"total"`
 	}
+	offset, limit := h.getPageInfo(r)
 	h.DoResp(
 		driver.CurrentDriver.JDevices[getCameraName(r)].Camera,
 		w,
 		func(c jdevice.Camera) interface{} {
+
+			pageInfo, err := h.currentPage(offset, limit, c.GetVideoPaths())
+			if err != nil {
+				return err
+			}
 			return responce{
-				ImageURLs: c.GetImagePaths(),
+				ImageURLs: pageInfo,
+				Total:     len(c.GetImagePaths()),
 			}
 		})
 }
@@ -53,13 +61,21 @@ func (h *handler) getImageURls(w http.ResponseWriter, r *http.Request) {
 func (h *handler) getVideoURLs(w http.ResponseWriter, r *http.Request) {
 	type responce struct {
 		VideoURLs []string `json:"videourls"`
+		Total     int      `json:"total"`
 	}
+	offset, limit := h.getPageInfo(r)
+
 	h.DoResp(
 		driver.CurrentDriver.JDevices[getCameraName(r)].Camera,
 		w,
 		func(c jdevice.Camera) interface{} {
+			pageInfo, err := h.currentPage(offset, limit, c.GetVideoPaths())
+			if err != nil {
+				return err
+			}
 			return responce{
-				VideoURLs: c.GetVideoPaths(),
+				VideoURLs: pageInfo,
+				Total:     len(c.GetVideoPaths()),
 			}
 		})
 
@@ -67,5 +83,9 @@ func (h *handler) getVideoURLs(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) DoResp(camera jdevice.Camera, w http.ResponseWriter, getResp func(c jdevice.Camera) interface{}) {
 	resp := getResp(camera)
+	if v, ok := resp.(error); ok {
+		h.respFailed(v, w)
+		return
+	}
 	h.respSuccess(resp, w)
 }
