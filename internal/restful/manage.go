@@ -9,11 +9,10 @@ import (
 )
 
 func appendDeviceManageRoute(r *mux.Router, h *handler) {
+	r.Path("/devices").HandlerFunc(h.getAllCameraDevice).Methods(http.MethodGet)
+	r.Path("/devices").HandlerFunc(h.deleteRemoveAllCamera).Methods(http.MethodDelete)
 	prefix := "/device"
 	subRouter := r.PathPrefix(prefix).Subrouter()
-
-	subRouter.Path("/").HandlerFunc(h.getAllCameraDevice).Methods(http.MethodGet)
-	subRouter.Path("/devices").HandlerFunc(h.deleteRemoveAllCamera).Methods(http.MethodDelete)
 	subRouter.Path("/{camera_name}").HandlerFunc(h.getCameraInfo).Methods(http.MethodGet)
 	subRouter.Path("/{camera_name}").HandlerFunc(h.deleteRemoveCamera).Methods(http.MethodDelete)
 	subRouter.Path("/{camera_name}/{device_type}").HandlerFunc(h.postAddCamera).Methods(http.MethodPost)

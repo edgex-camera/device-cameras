@@ -9,7 +9,7 @@ import (
 )
 
 func appendCameraResourcesRoute(r *mux.Router, h *handler) {
-	prefix := "/source"
+	prefix := "/resource"
 	subRouter := r.PathPrefix(prefix).Subrouter()
 	subRouter.Use(h.checkDeviceMiddvare, h.checkCameraMiddvare)
 
