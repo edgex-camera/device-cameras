@@ -34,6 +34,6 @@ func (h *handler) postModifyCameraConfig(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		h.respFailed(err, w)
 	}
-	newConfigure := JDevice.Camera.GetCapturePath()
+	newConfigure := JDevice.Camera.GetConfigure()
 	h.respSuccess(newConfigure, w)
 }
