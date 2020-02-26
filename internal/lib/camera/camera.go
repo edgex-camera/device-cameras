@@ -63,7 +63,7 @@ func (c *RawCamera) Enable() {
 			c.Lc.Error(fmt.Sprintf("image maintainer init failed: %v", err.Error()))
 		}
 		c.imageMaintainer = imageMaintainer
-		c.imageMaintainer.start()
+		go c.imageMaintainer.start()
 	}
 }
 
