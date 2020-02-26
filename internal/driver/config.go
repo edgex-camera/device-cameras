@@ -127,8 +127,7 @@ func (d *Driver) addDeviceByConfig(deviceName string, conf map[string]string) {
 		}
 		jDevice.Camera = deviceCamera
 		// 运行camera
-		//deviceCamera.MergeConfig([]byte(conf[deviceName+".camera."+channelId]))
-		deviceCamera.MergeConfig()
+		deviceCamera.MergeConfig(conf)
 		// 将jDevice加入到driver
 		d.JDevices[deviceName] = jDevice
 	}
@@ -139,11 +138,11 @@ func (d *Driver) modifyDeviceByConfig(deviceName string, conf map[string]string)
 
 	// 更新摄像头配置
 	if d.JDevices[deviceName].Camera != nil {
-		d.JDevices[deviceName].Camera.MergeConfig()
+		d.JDevices[deviceName].Camera.MergeConfig(conf)
 	}
 
 	// 更新控制协议配置
 	if d.JDevices[deviceName].Control != nil {
-		d.JDevices[deviceName].Control.MergeConfig()
+		d.JDevices[deviceName].Control.MergeConfig(conf)
 	}
 }

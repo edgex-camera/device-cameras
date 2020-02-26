@@ -2,6 +2,7 @@ package camera
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -12,14 +13,13 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
 )
 
-const IMAGE_PREFIX = "__keep"
-
 type imageMaintainer struct {
 	lc        logger.LoggingClient
 	seconds   int
 	number    int
 	path      string
 	ext       string
+	prefix    string
 	dir       string
 	imageList []string
 	enabled   bool
@@ -33,6 +33,7 @@ func newImageMaintainer(lc logger.LoggingClient, path string, seconds, number in
 		number:    number,
 		path:      path,
 		ext:       filepath.Ext(path),
+		prefix:    strings.TrimSuffix(path, filepath.Ext(path)),
 		dir:       filepath.Dir(path),
 		imageList: imageList,
 	}
@@ -52,10 +53,11 @@ func (im *imageMaintainer) init() error {
 	sort.Slice(files, func(i, j int) bool {
 		return files[i].ModTime().Before(files[j].ModTime())
 	})
+	fmt.Println(files)
 
 	for _, file := range files {
 		path := im.dir + "/" + file.Name()
-		if strings.HasPrefix(file.Name(), IMAGE_PREFIX) {
+		if strings.HasPrefix(path, im.prefix) && path != im.path {
 			im.imageList = append(im.imageList, path)
 			if len(im.imageList) > im.number {
 				os.Remove(im.imageList[0])
@@ -70,7 +72,13 @@ func (im *imageMaintainer) init() error {
 }
 
 func (im *imageMaintainer) start() error {
-	go im.loop()
+	for {
+		err := im.loop()
+		if err != nil {
+			im.lc.Error(fmt.Sprint("storing images error: ", err))
+		}
+		time.Sleep(time.Duration(im.seconds) * time.Second)
+	}
 	return nil
 }
 
@@ -84,19 +92,20 @@ func (im *imageMaintainer) loop() error {
 	}
 	defer from.Close()
 
-	toPath := fmt.Sprintf("%v/%d.%v", im.dir, time.Now().Unix(), im.ext)
+	toPath := fmt.Sprintf("%v%d%v", strings.TrimSuffix(im.path, im.ext), time.Now().Unix(), im.ext)
 	to, err := os.OpenFile(toPath, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return err
 	}
 	defer to.Close()
+	io.Copy(to, from)
+
 	im.imageList = append(im.imageList, toPath)
 	if len(im.imageList) > im.number {
 		os.Remove(im.imageList[0])
 		im.imageList = im.imageList[1:]
 	}
-	time.Sleep(time.Duration(im.seconds) * time.Second)
-	return im.loop()
+	return nil
 }
 
 func (im *imageMaintainer) stop() {
