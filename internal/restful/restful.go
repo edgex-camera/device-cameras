@@ -1,6 +1,7 @@
 package restful
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/edgexfoundry/device-sdk-go"
@@ -20,11 +21,13 @@ func InitRestRoutes(lc logger.LoggingClient) http.Handler {
 		Router: mux.NewRouter(),
 		lc:     lc,
 	}
+	h.Router.Use(logMiddeware)
 	r := h.Router.PathPrefix(APIv1Prefix).Subrouter()
 	appendDeviceManageRoute(r, h)
 	appendCameraResourcesRoute(r, h)
 	appendOnvifRoute(r, h)
 	appendConfigRoute(r, h)
+	appendStaticRoute(r, h)
 	return h
 }
 
@@ -34,4 +37,10 @@ func (h *handler) getTemplateOutput(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.lc.Error(err.Error())
 	}
+}
+func logMiddeware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.URL.String())
+		h.ServeHTTP(w, r)
+	})
 }
