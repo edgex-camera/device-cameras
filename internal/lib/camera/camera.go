@@ -121,6 +121,9 @@ func (c *RawCamera) GetCapturePath() string {
 }
 
 func (c *RawCamera) GetVideoPaths() []string {
+	if c.videoMaintainer == nil {
+		return []string{}
+	}
 	return c.videoMaintainer.getFileList()
 }
 
@@ -129,5 +132,8 @@ func (c *RawCamera) GetStreamAddr() string {
 }
 
 func (c *RawCamera) GetImagePaths() []string {
+	if c.imageMaintainer == nil {
+		return []string{}
+	}
 	return c.imageMaintainer.getFileList()
 }
