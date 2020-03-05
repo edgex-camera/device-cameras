@@ -24,7 +24,7 @@ GIT_SHA=$(shell git rev-parse HEAD)
 GOFLAGS=-ldflags "-X $(SRC_PATH).Version=$(VERSION)"
 
 MICROSERVICES=device-service
-.PHONY: $(MICROSERVICES)
+.PHONY: $(MICROSERVICES) frontend
 
 check_version:
 ifeq ($(VERSION),)
@@ -34,7 +34,7 @@ ifeq ($(shell git cat-file -t v$(VERSION)),commit)
 	$(error Changelog should be in tag message)
 endif
 
-build: check_version $(MICROSERVICES) changelog
+build: check_version $(MICROSERVICES) frontend changelog
 
 build-amd64: GOARCH=amd64 build
 
@@ -113,3 +113,12 @@ test:
 
 clean:
 	rm -rf build/
+
+frontend:
+	npm config set registry http://npm.registry.jiangxingai.com:7001/
+	cd frontend; \
+		npm i; \
+		CI=false npm run build
+	mkdir -p build
+	rm -rf build/frontend
+	mv frontend/build build/frontend
