@@ -42,14 +42,12 @@ func (h *handler) getPresetPosition(w http.ResponseWriter, r *http.Request) {
 
 // 移动
 func (h *handler) postOnvifMove(w http.ResponseWriter, r *http.Request) {
-	type vector2D struct {
-		X float64 `json:"x"`
-		Y float64 `json:"y"`
-	}
+
 	type request struct {
-		PanTiltSpeed vector2D `json:"pantiltspeed"`
-		Zoom         float64  `json:"root"`
-		TimeOut      int      `json:"timeout"`
+		X       float64 `json:"x"`
+		Y       float64 `json:"y"`
+		Zoom    float64 `json:"zoom"`
+		TimeOut int     `json:"timeout"`
 	}
 
 	data, err := ioutil.ReadAll(r.Body)
@@ -58,9 +56,7 @@ func (h *handler) postOnvifMove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req := request{
-		PanTiltSpeed: vector2D{},
-	}
+	req := request{}
 	err = json.Unmarshal(data, &req)
 	if err != nil {
 		h.respFailed(err, w)
@@ -68,8 +64,8 @@ func (h *handler) postOnvifMove(w http.ResponseWriter, r *http.Request) {
 
 	move := onvif.Move{
 		PanTiltSpeed: onvif.Vector2D{
-			X: req.PanTiltSpeed.X,
-			Y: req.PanTiltSpeed.Y,
+			X: req.X,
+			Y: req.Y,
 		},
 		Zoom: req.Zoom,
 	}
