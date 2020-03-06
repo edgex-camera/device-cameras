@@ -18,6 +18,8 @@ func appendOnvifRoute(r *mux.Router, h *handler) {
 	subRouter := r.PathPrefix(prefix).Subrouter()
 	subRouter.Use(h.checkDeviceMiddvare, h.checkOnvifMiddvare)
 
+	subRouter.Path("/{camera_name}/config").HandlerFunc(h.setConfig).Methods(http.MethodPost)
+	subRouter.Path("/{camera_name}/config").HandlerFunc(h.getConfig).Methods(http.MethodGet)
 	subRouter.Path("/{camera_name}/presets").HandlerFunc(h.getPresetPosition).Methods(http.MethodGet)
 	subRouter.Path("/{camera_name}/continuous_move").HandlerFunc(h.postOnvifMove).Methods(http.MethodPost)
 	subRouter.Path("/{camera_name}/stop").HandlerFunc(h.postOnvifStop).Methods(http.MethodPost)
@@ -26,6 +28,23 @@ func appendOnvifRoute(r *mux.Router, h *handler) {
 	subRouter.Path("/{camera_name}/set_preset/{preset-number}").HandlerFunc(h.postSetPresetPosition).Methods(http.MethodPost)
 	subRouter.Path("/{camera_name}/goto_preset/{preset-number}").HandlerFunc(h.postGotoPresetPosition).Methods(http.MethodPost)
 
+}
+
+func (h *handler) setConfig(w http.ResponseWriter, r *http.Request) {
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		h.respFailed(err, w)
+		return
+	}
+
+	driver.CurrentDriver.JDevices[getCameraName(r)].Control.PutConfig(data)
+	h.respSuccess(nil, w)
+}
+func (h *handler) getConfig(w http.ResponseWriter, r *http.Request) {
+	data := driver.CurrentDriver.JDevices[getCameraName(r)].Control.GetConfigure()
+
+	h.respSuccess(data, w)
 }
 
 // 获取预置位信息
