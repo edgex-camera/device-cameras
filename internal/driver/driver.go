@@ -85,7 +85,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]cont
 			}
 		}
 	}
-	return nil, err
+	return res, err
 }
 
 func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]contract.ProtocolProperties, reqs []dsModels.CommandRequest, params []*dsModels.CommandValue) error {
@@ -136,7 +136,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]con
 					return d.JDevices[deviceName].Camera.PutConfig([]byte(v))
 				}
 			default:
-				if d.JDevices[deviceName].Control != nil {
+				if d.JDevices[deviceName].Control == nil {
 					return errors.New("Current device does not support control protocols")
 				}
 				moveHandled := false

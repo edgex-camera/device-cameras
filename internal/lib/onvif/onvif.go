@@ -78,11 +78,11 @@ func (c *OnvifCamera) ContinuousMove(timeout time.Duration, moveSpeed Move) erro
 	c.ensureNoStopTimer()
 
 	err := c.callMethod(req)
-	c.mutex.Lock()
+	c.Mutex.Lock()
 	if c.stopTimer == nil {
 		c.stopTimer = time.AfterFunc(timeout, func() { _ = c.Stop() })
 	}
-	c.mutex.Unlock()
+	c.Mutex.Unlock()
 	return err
 }
 
@@ -174,10 +174,10 @@ func (c *OnvifCamera) SyncTime() error {
 
 // helpers
 func (c *OnvifCamera) ensureNoStopTimer() {
-	c.mutex.Lock()
+	c.Mutex.Lock()
 	if c.stopTimer != nil {
 		c.stopTimer.Stop()
 		c.stopTimer = nil
 	}
-	c.mutex.Unlock()
+	c.Mutex.Unlock()
 }
