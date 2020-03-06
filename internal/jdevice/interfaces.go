@@ -33,6 +33,7 @@ type Camera interface {
 type Control interface {
 	MergeConfig(map[string]string) error // 整合新配置
 	PutConfig([]byte) error              // 上传新配置
+	GetConfigure() []byte
 
 	ContinuousMove(time time.Duration, move onvif.Move) error // 移动摄像头
 	Stop() error                                              // 停止摄像头
