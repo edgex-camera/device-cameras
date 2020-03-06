@@ -19,7 +19,11 @@ type OnvifDevice interface {
 
 func (c *OnvifCamera) connect() (err error) {
 	if c.profileToken == "" {
-		c.profileToken = getToken(c.OnvifConfig)
+		token, err := getToken(c.OnvifConfig)
+		if err != nil {
+			return err
+		}
+		c.profileToken = token
 	}
 	defer func() {
 		if r := recover(); r != nil {

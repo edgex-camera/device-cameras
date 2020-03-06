@@ -14,11 +14,14 @@ import (
 	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
 )
 
-func getToken(config OnvifConfig) onvif.ReferenceToken {
+func getToken(config OnvifConfig) (onvif.ReferenceToken, error) {
 	device, _ := goonvif.NewDevice(config.Address)
 	device.Authenticate(config.Username, config.Password)
 	req := Media.GetProfiles{}
-	res, _ := device.CallMethod(req)
+	res, err := device.CallMethod(req)
+	if err != nil {
+		return "", err
+	}
 	body, _ := ioutil.ReadAll(res.Body)
 
 	var response struct {
@@ -32,7 +35,7 @@ func getToken(config OnvifConfig) onvif.ReferenceToken {
 
 	// 取第一个Profile使用
 	profile := response.Body.GetProfilesResponse.Profiles[0]
-	return profile.Token
+	return profile.Token, nil
 }
 
 // 新建预置点配置，1点占用，2-255未占用
