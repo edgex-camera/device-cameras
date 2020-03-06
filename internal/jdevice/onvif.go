@@ -2,6 +2,7 @@ package jdevice
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/edgexfoundry/device-sdk-go"
 	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
@@ -14,6 +15,7 @@ func NewOnvif(name string, lc logger.LoggingClient, config onvif.OnvifConfig) (C
 		Name:        name,
 		Lc:          lc,
 		OnvifConfig: config,
+		Mutex:       &sync.Mutex{},
 	}
 	err := SetupOnvifConfig(oc.OnvifConfig, name)
 	if err != nil {
@@ -22,11 +24,21 @@ func NewOnvif(name string, lc logger.LoggingClient, config onvif.OnvifConfig) (C
 	return oc, nil
 }
 
-func SetupOnvifConfig(onvif onvif.OnvifConfig, name string) error {
+func SetupOnvifConfig(onvifConf onvif.OnvifConfig, name string) error {
 	configName := name + ".onvif.config"
 	if _, ok := device.DriverConfigs()[configName]; !ok {
-		config, _ := json.Marshal(onvif)
-		return jxstartup.PutDriverConfig(configName, config)
+		config, _ := json.Marshal(onvifConf)
+		err := jxstartup.PutDriverConfig(configName, config)
+		if err != nil {
+			return err
+		}
+	}
+	presetsName := name + ".onvif.presets"
+	if _, ok := device.DriverConfigs()[presetsName]; !ok {
+		err := onvif.InitPresetsConfig(name)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

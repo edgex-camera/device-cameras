@@ -24,7 +24,7 @@ type OnvifCamera struct {
 	Lc           logger.LoggingClient
 	OnvifConfig  OnvifConfig
 	stopTimer    *time.Timer
-	mutex        *sync.Mutex
+	Mutex        *sync.Mutex
 	profileToken onvif.ReferenceToken
 }
 

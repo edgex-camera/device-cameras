@@ -36,15 +36,15 @@ func getToken(config OnvifConfig) onvif.ReferenceToken {
 }
 
 // 新建预置点配置，1点占用，2-255未占用
-func InitPresetsConfig(name string) {
-	configName := name + "/onvif/presets"
+func InitPresetsConfig(name string) error {
+	configName := name + ".onvif.presets"
 	presets := make(map[int64]bool)
 	presets[1] = true
 	for i := 2; i < 256; i++ {
 		presets[int64(i)] = false
 	}
 	config, _ := json.Marshal(presets)
-	jxstartup.PutDriverConfig(configName, config)
+	return jxstartup.PutDriverConfig(configName, config)
 }
 
 func getPresets(name string) string {
