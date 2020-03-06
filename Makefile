@@ -57,7 +57,7 @@ docker-arm64: docker
 
 docker: docker-gst-rk docker-ffmpeg
 
-docker-gst-rk: build
+docker-gst-rk: frontend build
 	docker build \
 				--label "git_sha=$(GIT_SHA)" \
 		--build-arg GOARCH=$(GOARCH) \
@@ -67,7 +67,7 @@ docker-gst-rk: build
 		-t $(DOCKER_IMAGE_NAME_GST_RK):$(ARCHTAG)-cpu-latest \
 		build
 
-docker-ffmpeg: build
+docker-ffmpeg: frontend build
 		docker build \
 		--label "git_sha=$(GIT_SHA)" \
 		--build-arg GOARCH=$(GOARCH) \
