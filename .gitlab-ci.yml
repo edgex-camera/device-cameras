@@ -1,4 +1,4 @@
-image: registry.jiangxingai.com:5000/cicd/golang-nodejs-dind:latest
+image: golang-nodejs-dind:latest
 
 variables:
   GO111MODULE: "on"
