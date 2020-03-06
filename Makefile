@@ -2,7 +2,7 @@ BUILDDIR=build/
 CHANGELOG=$(BUILDDIR)/CHANGELOG.md
 
 GOPROXY=https://mirrors.aliyun.com/goproxy/
-# UPDATE_SUBMODULE:=$(shell git submodule update --init --remote)
+UPDATE_SUBMODULE:=$(shell git submodule update --init --remote)
 GO=CGO_ENABLED=0 GO111MODULE=on go
 
 # office registry
