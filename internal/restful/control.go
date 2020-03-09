@@ -25,8 +25,8 @@ func appendOnvifRoute(r *mux.Router, h *handler) {
 	subRouter.Path("/{camera_name}/stop").HandlerFunc(h.postOnvifStop).Methods(http.MethodPost)
 	subRouter.Path("/{camera_name}/set_home_position").HandlerFunc(h.postSetHomePosition).Methods(http.MethodPost)
 	subRouter.Path("/{camera_name}/reset_position").HandlerFunc(h.postResetPosition).Methods(http.MethodPost)
-	subRouter.Path("/{camera_name}/set_preset/{preset-number}").HandlerFunc(h.postSetPresetPosition).Methods(http.MethodPost)
-	subRouter.Path("/{camera_name}/goto_preset/{preset-number}").HandlerFunc(h.postGotoPresetPosition).Methods(http.MethodPost)
+	subRouter.Path("/{camera_name}/set_preset/{preset_number}").HandlerFunc(h.postSetPresetPosition).Methods(http.MethodPost)
+	subRouter.Path("/{camera_name}/goto_preset/{preset_number}").HandlerFunc(h.postGotoPresetPosition).Methods(http.MethodPost)
 
 }
 
