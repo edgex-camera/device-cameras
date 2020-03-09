@@ -93,7 +93,7 @@ func (h *handler) postOnvifMove(w http.ResponseWriter, r *http.Request) {
 		driver.CurrentDriver.JDevices[getCameraName(r)].Control,
 		w,
 		func(jOnvif jdevice.Control) error {
-			return jOnvif.ContinuousMove(time.Duration(req.TimeOut)*time.Second, move)
+			return jOnvif.ContinuousMove(time.Duration(req.TimeOut)*time.Millisecond, move)
 		})
 }
 
