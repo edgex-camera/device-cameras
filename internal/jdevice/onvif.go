@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"sync"
 
-	"github.com/edgexfoundry/device-sdk-go"
-	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
+	"github.com/edgex-camera/device-cameras/internal/lib/onvif"
+	"github.com/edgex-camera/device-sdk-go"
+	"github.com/edgex-camera/device-sdk-go/pkg/camstartup"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/onvif"
 )
 
 func NewOnvif(name string, lc logger.LoggingClient, config onvif.OnvifConfig) (Control, error) {
@@ -28,7 +28,7 @@ func SetupOnvifConfig(onvifConf onvif.OnvifConfig, name string) error {
 	configName := name + ".onvif.config"
 	if _, ok := device.DriverConfigs()[configName]; !ok {
 		config, _ := json.Marshal(onvifConf)
-		err := jxstartup.PutDriverConfig(configName, config)
+		err := camstartup.PutDriverConfig(configName, config)
 		if err != nil {
 			return err
 		}

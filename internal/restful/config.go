@@ -4,8 +4,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/edgex-camera/device-cameras/internal/driver"
 	"github.com/gorilla/mux"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/driver"
 )
 
 func appendConfigRoute(r *mux.Router, h *handler) {

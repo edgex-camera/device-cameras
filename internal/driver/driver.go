@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"time"
 
-	dsModels "github.com/edgexfoundry/device-sdk-go/pkg/models"
+	"github.com/edgex-camera/device-cameras/internal/jdevice"
+	dsModels "github.com/edgex-camera/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
 	contract "github.com/edgexfoundry/go-mod-core-contracts/models"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice"
 )
 
 const CAMERA_FACTORY = "camera-factory"

@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/edgex-camera/device-cameras/internal/driver"
+	"github.com/edgex-camera/device-cameras/internal/lib/camera"
 	"github.com/gorilla/mux"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/driver"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/camera"
 )
 
 //基本responce 结构

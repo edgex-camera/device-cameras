@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/edgex-camera/device-cameras/internal/lib/utils/process"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/utils/process"
 )
 
 type RawCamera struct {

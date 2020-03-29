@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice/normalcam"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/camera"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/camera/cmder"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/onvif"
+	"github.com/edgex-camera/device-cameras/internal/jdevice"
+	"github.com/edgex-camera/device-cameras/internal/jdevice/normalcam"
+	"github.com/edgex-camera/device-cameras/internal/lib/camera"
+	"github.com/edgex-camera/device-cameras/internal/lib/camera/cmder"
+	"github.com/edgex-camera/device-cameras/internal/lib/onvif"
 )
 
 func (d *Driver) OnConfigChange(oldConf map[string]string, newConf map[string]string) {

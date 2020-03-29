@@ -3,11 +3,11 @@ package normalcam
 import (
 	"encoding/json"
 
-	"github.com/edgexfoundry/device-sdk-go"
-	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
+	"github.com/edgex-camera/device-cameras/internal/jdevice"
+	"github.com/edgex-camera/device-cameras/internal/lib/camera"
+	"github.com/edgex-camera/device-sdk-go"
+	"github.com/edgex-camera/device-sdk-go/pkg/camstartup"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/camera"
 )
 
 type NormalCamera struct {
@@ -48,7 +48,7 @@ func SetupRawCameraConfig(c camera.RawCamera, name, channelId string) error {
 	basicConfName := name + ".camera"
 	basicJson, _ := json.Marshal(map[string]bool{channelId: true})
 	if string(basicJson) != device.DriverConfigs()[basicConfName] {
-		err := jxstartup.PutDriverConfig(basicConfName, basicJson)
+		err := camstartup.PutDriverConfig(basicConfName, basicJson)
 		if err != nil {
 			return err
 		}
@@ -56,7 +56,7 @@ func SetupRawCameraConfig(c camera.RawCamera, name, channelId string) error {
 
 	configName := name + ".camera." + channelId
 	if _, ok := device.DriverConfigs()[configName]; !ok {
-		return jxstartup.PutDriverConfig(configName, c.GetConfigure())
+		return camstartup.PutDriverConfig(configName, c.GetConfigure())
 	}
 	return nil
 }

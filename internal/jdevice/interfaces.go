@@ -4,7 +4,7 @@ import (
 	"os"
 	"time"
 
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/onvif"
+	"github.com/edgex-camera/device-cameras/internal/lib/onvif"
 )
 
 // Camera stores config and provide REST interface

@@ -3,8 +3,8 @@ package driver
 import (
 	"time"
 
-	dsModels "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/onvif"
+	"github.com/edgex-camera/device-cameras/internal/lib/onvif"
+	dsModels "github.com/edgex-camera/device-sdk-go/pkg/models"
 )
 
 func (d *Driver) HandleMoveCommand(deviceName string, params []*dsModels.CommandValue) error {

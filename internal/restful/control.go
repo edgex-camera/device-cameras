@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/edgex-camera/device-cameras/internal/driver"
+	"github.com/edgex-camera/device-cameras/internal/jdevice"
+	"github.com/edgex-camera/device-cameras/internal/lib/onvif"
 	"github.com/gorilla/mux"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/driver"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/onvif"
 )
 
 func appendOnvifRoute(r *mux.Router, h *handler) {

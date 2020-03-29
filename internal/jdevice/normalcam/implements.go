@@ -4,8 +4,8 @@ import (
 	"errors"
 	"os"
 
-	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/utils"
+	"github.com/edgex-camera/device-cameras/internal/lib/utils"
+	"github.com/edgex-camera/device-sdk-go/pkg/camstartup"
 )
 
 // camera functions
@@ -53,7 +53,7 @@ func (nc *NormalCamera) GetConfigure() []byte {
 
 func (nc *NormalCamera) PutConfig(config []byte) error {
 	configName := nc.Name + ".camera." + nc.ChannelId
-	return jxstartup.PutDriverConfig(configName, config)
+	return camstartup.PutDriverConfig(configName, config)
 }
 
 func (nc *NormalCamera) AddChannel() error {

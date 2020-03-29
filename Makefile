@@ -17,7 +17,7 @@ HARBOR_IOTEDGE_IMAGE_NAME_FFMPEG=harbor.jiangxingai.com/library/edgex-cameras-ff
 
 GOARCH=arm64
 ARCHTAG=arm64v8
-SRC_PATH=gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras
+SRC_PATH=github.com/edgex-camera/device-cameras
 
 VERSION=$(shell git tag -l "v*" --points-at HEAD | tail -n 1 | tail -c +2)
 GIT_SHA=$(shell git rev-parse HEAD)
