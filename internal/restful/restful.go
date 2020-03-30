@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/edgexfoundry/device-sdk-go"
+	"github.com/edgex-camera/device-sdk-go"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
 	"github.com/gorilla/mux"
 )

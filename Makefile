@@ -17,14 +17,14 @@ HARBOR_IOTEDGE_IMAGE_NAME_FFMPEG=harbor.jiangxingai.com/library/edgex-cameras-ff
 
 GOARCH=arm64
 ARCHTAG=arm64v8
-SRC_PATH=gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras
+SRC_PATH=github.com/edgex-camera/device-cameras
 
 VERSION=$(shell git tag -l "v*" --points-at HEAD | tail -n 1 | tail -c +2)
 GIT_SHA=$(shell git rev-parse HEAD)
 GOFLAGS=-ldflags "-X $(SRC_PATH).Version=$(VERSION)"
 
 MICROSERVICES=device-service
-.PHONY: $(MICROSERVICES) frontend
+.PHONY: $(MICROSERVICES)
 
 check_version:
 ifeq ($(VERSION),)
@@ -34,7 +34,7 @@ ifeq ($(shell git cat-file -t v$(VERSION)),commit)
 	$(error Changelog should be in tag message)
 endif
 
-build: check_version $(MICROSERVICES) frontend changelog
+build: check_version $(MICROSERVICES) changelog
 
 build-amd64: GOARCH=amd64 build
 
@@ -57,7 +57,7 @@ docker-arm64: docker
 
 docker: docker-gst-rk docker-ffmpeg
 
-docker-gst-rk: frontend build
+docker-gst-rk: build
 	docker build \
 				--label "git_sha=$(GIT_SHA)" \
 		--build-arg GOARCH=$(GOARCH) \
@@ -67,7 +67,7 @@ docker-gst-rk: frontend build
 		-t $(DOCKER_IMAGE_NAME_GST_RK):$(ARCHTAG)-cpu-latest \
 		build
 
-docker-ffmpeg: frontend build
+docker-ffmpeg: build
 		docker build \
 		--label "git_sha=$(GIT_SHA)" \
 		--build-arg GOARCH=$(GOARCH) \
@@ -114,11 +114,3 @@ test:
 clean:
 	rm -rf build/
 
-frontend:
-	npm config set registry http://npm.registry.jiangxingai.com:7001/
-	cd frontend; \
-		npm i; \
-		CI=false npm run build
-	mkdir -p build
-	rm -rf build/frontend
-	mv frontend/build build/frontend

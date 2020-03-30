@@ -11,10 +11,10 @@ package main
 import (
 	"flag"
 
-	"github.com/edgexfoundry/device-sdk-go"
-	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/driver"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/restful"
+	"github.com/edgex-camera/device-cameras/internal/driver"
+	"github.com/edgex-camera/device-cameras/internal/restful"
+	"github.com/edgex-camera/device-sdk-go"
+	"github.com/edgex-camera/device-sdk-go/pkg/camstartup"
 )
 
 const (
@@ -28,7 +28,7 @@ func main() {
 	flag.Parse()
 
 	driver.CurrentDriver = driver.Driver{ProcessMethod: processMethod}
-	err := jxstartup.StartServiceWithHandler(serviceName, device.Version, &driver.CurrentDriver, restful.InitRestRoutes, staticPath)
+	err := camstartup.StartServiceWithHandler(serviceName, device.Version, &driver.CurrentDriver, restful.InitRestRoutes, staticPath)
 	if err != nil {
 		panic(err)
 	}

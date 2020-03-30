@@ -22,7 +22,7 @@
 
 
 # Next image - Copy built Go binary into new workspace
-FROM registry.jiangxingai.com:5000/base/device-pipe:arm64v8-cpu-0.1.1
+FROM jk97/deivce-pipe:arm64v8-cpu-0.0.1
 ARG GOARCH
 
 ENV APP_PORT=80

@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/edgexfoundry/device-sdk-go"
-	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice/normalcam"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/camera"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/camera/cmder"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/onvif"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/lib/utils"
+	"github.com/edgex-camera/device-cameras/internal/jdevice"
+	"github.com/edgex-camera/device-cameras/internal/jdevice/normalcam"
+	"github.com/edgex-camera/device-cameras/internal/lib/camera"
+	"github.com/edgex-camera/device-cameras/internal/lib/camera/cmder"
+	"github.com/edgex-camera/device-cameras/internal/lib/onvif"
+	"github.com/edgex-camera/device-cameras/internal/lib/utils"
+	"github.com/edgex-camera/device-sdk-go"
+	"github.com/edgex-camera/device-sdk-go/pkg/camstartup"
 )
 
 const ALL_DEVICES_KEY = "all_devices"
@@ -29,7 +29,7 @@ const PROCESS_FFMPEG = "ffmpeg"
 // Add Jdevice.
 func (d *Driver) AddJdevice(deviceName, deviceType string) error {
 	device := NewDevice(deviceName)
-	id, err := jxstartup.Service.AddDevice(device)
+	id, err := camstartup.Service.AddDevice(device)
 	if err != nil {
 		d.lc.Error(fmt.Sprintf("Failed to add device with error: %v", err))
 		return err
@@ -89,7 +89,7 @@ func (d *Driver) RemoveJdevice(deviceName string) error {
 	if err != nil {
 		return err
 	}
-	return jxstartup.Service.RemoveDeviceByName(deviceName)
+	return camstartup.Service.RemoveDeviceByName(deviceName)
 }
 
 // JDevice基础信息
@@ -107,7 +107,7 @@ func setupJdeviceConfig(jDevice jdevice.JDevice, enabled bool, deviceType string
 		delete(allDevicesMap, jDevice.Name)
 	}
 	allDevices, _ = json.Marshal(allDevicesMap)
-	err := jxstartup.PutDriverConfig(ALL_DEVICES_KEY, allDevices)
+	err := camstartup.PutDriverConfig(ALL_DEVICES_KEY, allDevices)
 	if err != nil {
 		return err
 	}
@@ -125,5 +125,5 @@ func setupJdeviceConfig(jDevice jdevice.JDevice, enabled bool, deviceType string
 	}
 	configName := config.Name
 	configBytes, _ := json.Marshal(config)
-	return jxstartup.PutDriverConfig(configName, configBytes)
+	return camstartup.PutDriverConfig(configName, configBytes)
 }

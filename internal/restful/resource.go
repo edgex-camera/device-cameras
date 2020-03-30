@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/edgex-camera/device-cameras/internal/driver"
+	"github.com/edgex-camera/device-cameras/internal/jdevice"
 	"github.com/gorilla/mux"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/driver"
-	"gitlab.jiangxingai.com/applications/edgex/device-service/device-cameras/internal/jdevice"
 )
 
 func appendCameraResourcesRoute(r *mux.Router, h *handler) {

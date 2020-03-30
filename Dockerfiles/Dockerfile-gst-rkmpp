@@ -22,7 +22,7 @@
 
 
 # Next image - Copy built Go binary into new workspace
-FROM registry.jiangxingai.com:5000/base/rkmpp-gstreamer-v4l2:arm64v8-cpu-1.0.2
+FROM jk97/rkmpp-gstreamer-v4l2:arm64v8-cpu-0.0.1
 ARG GOARCH
 
 ENV APP_PORT=80

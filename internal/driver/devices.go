@@ -1,7 +1,7 @@
 package driver
 
 import (
-	"github.com/edgexfoundry/device-sdk-go/pkg/jxstartup"
+	"github.com/edgex-camera/device-sdk-go/pkg/camstartup"
 	contract "github.com/edgexfoundry/go-mod-core-contracts/models"
 )
 
@@ -22,9 +22,9 @@ func NewDevice(deviceName string) contract.Device {
 }
 
 func GetDeviceByName(deviceName string) (contract.Device, error) {
-	return jxstartup.Service.GetDeviceByName(deviceName)
+	return camstartup.Service.GetDeviceByName(deviceName)
 }
 
 func GetDevices() []contract.Device {
-	return jxstartup.Service.Devices()
+	return camstartup.Service.Devices()
 }
